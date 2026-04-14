@@ -1,8 +1,6 @@
-int fact(int n) {
-  if (n <= 1)
-    return 1;
-  return n * fact(n - 1);
-}
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 int minimum (int a, int b, int c) {
     int min = a;
@@ -46,4 +44,20 @@ int LevenshteinDistance (char *a, char *b){
     free(D);
 
     return result;
+}
+
+int main(){
+
+    char *a = "CALLE";
+    char *b = "VALLE";
+    char *c = "VALLe";
+
+    int a_1 = LevenshteinDistance(a,b);
+    printf("canvis entre CALLE i VALLE = %d\n", a_1);
+
+    int a_2 = LevenshteinDistance(b,c);
+    printf("canvis entre VALLE i VALLe = %d\n", a_2);
+
+    int a_3 = LevenshteinDistance(a,c);
+    printf("canvis entre CALLE i VALLe = %d\n", a_3);
 }

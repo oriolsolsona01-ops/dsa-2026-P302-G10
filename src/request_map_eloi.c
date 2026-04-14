@@ -15,9 +15,10 @@ void find_street(char mapa[], char street[]){
         }
 
     while (!EOF){
-        fscanf(f_mapa,"")
-        LevenshteinDistance(street, b):
+        fscanf(f_mapa,"");
+        LevenshteinDistance(street,)
     }
+
 }
 
     
