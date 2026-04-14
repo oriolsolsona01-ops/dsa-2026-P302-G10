@@ -1,4 +1,5 @@
 #include "sample_lib.h"
+#include "houses.h"
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,11 +13,13 @@ void createaleak() {
 int main() {
   printf("*****************\nWelcome to DSA!\n*****************\n");
 
-  // how to import and call a function
-  printf("Factorial of 4 is %d\n", fact(4));
+    FILE* map_file = ask_map();
+    if (map_file == NULL) return 1;
 
-  // uncomment and run "make v" to see how valgrind detects memory leaks
-  // createaleak();
+    HouseNode* list_of_houses = fill_linkedlist(map_file);
+    fclose(map_file); 
 
-  return 0;
+    input_originposition(list_of_houses);
+
+    return 0;
 }

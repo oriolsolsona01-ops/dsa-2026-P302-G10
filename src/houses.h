@@ -10,3 +10,6 @@ typedef struct HouseNode {
     double lon;
     struct HouseNode* next; // Punter al següent node
 } HouseNode;
+
+HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon);
+HouseNode* find_house(HouseNode* head, char* target_street, int target_number);

@@ -30,7 +30,6 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
         }
 
         // Si la distància és menor que el nostre rècord actual, actualitzem el rècord
-        // (Nota: per ara ignorem el número de casa aquí, busquem el carrer més semblant)
         if (dist < min_distance) {
             min_distance = dist;
             best_match = current;
@@ -39,7 +38,6 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
         current = current->next;
     }
 
-    // Si hem acabat el bucle i no hem trobat una coincidència perfecta (0),
     // retornem la casa del carrer que s'assemblava més
     return best_match;
 }
