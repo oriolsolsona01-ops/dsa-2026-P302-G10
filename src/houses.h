@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 // Definim el node per a la llista de cases
 typedef struct HouseNode {
@@ -11,5 +13,8 @@ typedef struct HouseNode {
     struct HouseNode* next; // Punter al següent node
 } HouseNode;
 
+FILE* ask_map ();
 HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon);
+HouseNode* fill_linkedlist (FILE *fitxer);
 HouseNode* find_house(HouseNode* head, char* target_street, int target_number);
+void input_originposition(HouseNode* head);
