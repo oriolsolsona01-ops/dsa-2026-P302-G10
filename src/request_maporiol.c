@@ -24,28 +24,22 @@ FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document 
         return fitxer; 
 }
 
-    void houselinked_list (FILE *fitxer){
+    void fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
+
+        HouseNode* houses = NULL;
         while (!eof) {
-            add_house()
-            fscanf()
-
-
+            fscanf(fitxer, "%s,%d,%lf,%lf",street, &number, &lat, &lon);
+            houses = add_house(houses, street, number, lat, lon); 
+            
         }
 
-
-
-
-
-
-
-
-
-
-
     }
+
+
+    
 // -- ORIGIN
 
-void input_originposition(FILE* fitxer){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
+void input_originposition(FILE* fitxer, HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
 
     int posicio_origen;
     int num;
@@ -66,10 +60,10 @@ void input_originposition(FILE* fitxer){ // tasca 2,3 i 4 (el paràmtre d'entrad
         scanf("Introdueix el nom del carrer %s", street_name);
         scanf("Introdueix el número del carrer %d", num);
         //cal trobar les coordenades un cop tenint aquestes dades amb el nom i num amb fscanf
-        char* coordenades;
+        
     }
 
-    
+    //cal fer servir una funció que ha dit l'eloi
     
 }
 
