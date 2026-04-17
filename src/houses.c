@@ -46,6 +46,7 @@ HouseNode* fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llege
             houses = add_house(houses, street, number, lat, lon); 
             
         }
+        return houses;
     }
 
 HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
