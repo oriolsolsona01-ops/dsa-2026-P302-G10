@@ -101,7 +101,9 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
 
         printf("Enter street number (e.g. \"138\"): ");
         scanf("%d", &num);
-        //cal trobar les coordenades un cop tenint aquestes dades amb el nom i num amb fscanf
+
+        
+
 
         HouseNode* trobat = find_house(head, street_name, num);
 
@@ -113,3 +115,4 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
     }
     
 }
+void triar_num(street_name)
