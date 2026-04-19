@@ -11,15 +11,22 @@ void createaleak() {
 }
 
 int main() {
+
   printf("*****************\nWelcome to DSA!\n*****************\n");
+  
+  
+  char mapa [50];
+  printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
+  scanf("%s", mapa);
 
-    FILE* map_file = ask_map();
-    if (map_file == NULL) return 1;
 
-    HouseNode* list_of_houses = fill_linkedlist(map_file);
-    fclose(map_file); 
+  FILE* map_file = ask_map();
+  if (map_file == NULL) return 1;
 
-    input_originposition(list_of_houses);
+  HouseNode* list_of_houses = fill_linkedlist(map_file);
+  fclose(map_file); 
 
-    return 0;
+  input_originposition(list_of_houses);
+
+  return 0;
 }
