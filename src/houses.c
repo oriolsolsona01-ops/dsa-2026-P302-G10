@@ -49,15 +49,70 @@ HouseNode* fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llege
         return houses;
     }
 
+
+void to_lowercase(char* original, char* dest) {
+    int i = 0;
+    while (original[i] != '\0') {
+        // Comprovem si és una lletra majúscula utilitzant el seu valor ASCII
+        if (original[i] >= 'A' && original[i] <= 'Z') {
+            dest[i] = original[i] + 32; // Sumem 32 per passar-la a minúscula
+        } else {
+            dest[i] = original[i]; // Si ja era minúscula, número o espai, es queda igual
+        }
+        i++;
+    }
+    dest[i] = '\0'; // Marquem el final de l'string
+}
+
+void expand_abbreviations(const char* original, char* dest) {
+    // Comprovem si els primers 3 caràcters són "c. "
+    if (strncmp(original, "c. ", 3) == 0) {
+        strcpy(dest, "carrer ");
+        strcat(dest, original + 3);
+    } 
+    // Comprovem Avinguda ("av. " -> 4 caràcters)
+    else if (strncmp(original, "av. ", 4) == 0) {
+        strcpy(dest, "avinguda ");
+        strcat(dest, original + 4);
+    } 
+    // Comprovem Passeig ("pg. " -> 4 caràcters)
+    else if (strncmp(original, "pg. ", 4) == 0) {
+        strcpy(dest, "passeig ");
+        strcat(dest, original + 4);
+    } 
+    // Comprovem Passatge ("ptge. " -> 6 caràcters)
+    else if (strncmp(original, "ptge. ", 6) == 0) {
+        strcpy(dest, "passatge ");
+        strcat(dest, original + 6); // Saltem els 6 caràcters de "ptge. "
+    } 
+    // Si no comença per cap abreviatura, simplement ho copiem tal qual
+    else {
+        strcpy(dest, original);
+    }
+}
+
 HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
     HouseNode* current = head;
     
     HouseNode* best_match = NULL;
     int min_distance = 999999;
 
+    char lower_street[100];
+    to_lowercase(target_street,lower_street);
+
+    char expanded_street[150];
+    expand_abbreviations(lower_street,expanded_street);
+
+
     while (current != NULL) {
+        char lower_current[100];
+        to_lowercase(current->street_name,lower_current);
+
+        char expanded_current[150];
+        expand_abbreviations(lower_current,expanded_current);
+
         // Calculem la distància d'ortografia
-        int dist = LevenshteinDistance(current->street_name, target_street);
+        int dist = LevenshteinDistance(expanded_current, expanded_street);
 
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
         if (dist == 0 && current->house_number == target_number) {
@@ -69,8 +124,9 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
             min_distance = dist;
             best_match = current;
         }
-
+        
         current = current->next;
+
     }
 
     // retornem la casa del carrer que s'assemblava més
