@@ -1,5 +1,6 @@
-
-
+#include <stdio.h>
+#include "houses.h"
+#include "sample_lib.h"
 
 void input_originposition(HouseNode* head) {
     int posicio_origen;

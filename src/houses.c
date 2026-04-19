@@ -113,7 +113,7 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
 
         // Calculem la distància d'ortografia
         int dist = LevenshteinDistance(expanded_current, expanded_street);
-
+        
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
         if (dist == 0 && current->house_number == target_number) {
             return current;
@@ -171,4 +171,3 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
     }
     
 }
-void triar_num(street_name)
