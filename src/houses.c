@@ -31,20 +31,20 @@ HouseNode* add_house(HouseNode* head, char* street, int number, double lat, doub
     return new_house;
 }
 
-HouseNode* fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
-        char street[100];
-        int number;
-        double lat;
-        double lon;
-        HouseNode* houses = NULL;
+HouseNode* fill_linked_list_houses (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
+    char street[100];
+    int number;
+    double lat;
+    double lon;
+    HouseNode* houses = NULL;
 
-        while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
+    while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
 
-            houses = add_house(houses, street, number, lat, lon); 
-            
-        }
-        return houses;
+        houses = add_house(houses, street, number, lat, lon); 
+        
     }
+    return houses;
+}
 
 
 void to_lowercase(char* original, char* dest) {
@@ -158,51 +158,4 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     // En cas de no trobar cap coïncidència, diem que el número no es vàlid
     printf("Número invàlid.\n");
     return NULL;
-}
-
-void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
-
-    int posicio_origen;
-    int num;
-    char street_name[100];
-
-    printf("\n--- ORIGIN ---\n");
-    printf("Where are you? Address (1), Place (2) or Coordinate (3): ");
-    scanf("%d", &posicio_origen);
-
-    while (posicio_origen < 1 || posicio_origen > 3){
-        printf("Invalid option. Where are you? Address (1), Place (2) or Coordinate (3): ");
-        scanf("%d", &posicio_origen);
-    }
-    if (posicio_origen == 1){
-
-        FILE* map_file = open_map_house(mapa);
-        if (map_file == NULL) return 1;
-
-        HouseNode* list_of_houses = fill_linkedlist(map_file);
-        fclose(map_file);
-
-        printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
-        scanf(" %[^\n]", street_name);
-
-        HouseNode* trobat = find_house_name(list_of_houses, street_name);
-        
-        printf("Enter street number (e.g. \"138\"): ");
-        scanf("%d", &num);
-
-        HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
-
-        if (final_house != NULL) {
-            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
-        } else {
-            printf("Address not found.\n");
-        }
-
-    }
-    else if(posicio_origen == 2){
-        //aqui va lo de places eric
-    }
-    else{
-        printf("Not implemented yet.\n"); 
-    }
 }

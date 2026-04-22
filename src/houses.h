@@ -17,6 +17,6 @@ FILE* ask_map ();
 HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon);
 void to_lowercase(char* original, char* dest);
 void expand_abbreviations(const char* original, char* dest);
-HouseNode* fill_linkedlist (FILE *fitxer);
+HouseNode* fill_linked_list_houses (FILE *fitxer);
 HouseNode* find_house(HouseNode* head, char* target_street, int target_number);
 void input_originposition(HouseNode* head);

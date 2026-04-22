@@ -1,4 +1,5 @@
 #include "sample_lib.h"
+#include "places.h"
 #include "houses.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@ void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada 
     int posicio_origen;
     int num;
     char street_name[100];
+    char place_name[100];
 
     printf("\n--- ORIGIN ---\n");
     printf("Where are you? Address (1), Place (2) or Coordinate (3): ");
@@ -50,7 +52,22 @@ void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada 
 
     }
     else if(posicio_origen == 2){
-        //aqui va lo de places eric
+        FILE* map_file = open_map_place(mapa);
+        if (map_file == NULL) return 1;
+
+        PlaceNode* list_of_places = fill_linkedlist(map_file);
+        fclose(map_file);
+
+        printf("Enter place name (e.g. \"Universitat Pompeu Fabra–Campus del Poblenou\" or \"L'Illa Diagonal\"): ");
+        scanf(" %[^\n]", place_name);
+
+        PlaceNode* trobat = find_place(list_of_places, place_name);
+
+        if (trobat != NULL) {
+            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
+        } else {
+            printf("Place not found.\n");
+        }
     }
     else{
         printf("Not implemented yet.\n"); 
