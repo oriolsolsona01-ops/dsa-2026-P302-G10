@@ -1,12 +1,9 @@
 #include "houses.h"
 #include "sample_lib.h"
 
-FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
+FILE* open_map_house(char mapa){ // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
-    char mapa[50];
-    
-    printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
-    scanf("%s", mapa);
+
 
     //creem un string amb la ruta sencera del filename
     char rutafinal [150];
@@ -91,7 +88,7 @@ void expand_abbreviations(const char* original, char* dest) {
     }
 }
 
-HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
+HouseNode* find_house_name(HouseNode* head, char* target_street) {
     HouseNode* current = head;
     
     HouseNode* best_match = NULL;
@@ -115,25 +112,55 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
         int dist = LevenshteinDistance(expanded_current, expanded_street);
         
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
-        if (dist == 0 && current->house_number == target_number) {
+        if (dist == 0) {
             return current;
         }
-
-        // Si la distància és menor que el nostre rècord actual, actualitzem el rècord
-        if (dist < min_distance) {
-            min_distance = dist;
-            best_match = current;
-        }
-        
-        current = current->next;
-
+        //aqui falta ficar el sorting
     }
 
-    // retornem la casa del carrer que s'assemblava més
-    return best_match;
+    // sorting
+
 }
 
-void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
+HouseNode* triar_num(HouseNode* head, char *street_name, int num){
+    
+    HouseNode* current = head;
+    while (current != NULL){
+        // Mirem si coincideix i, en cas de que si, presentem per pantalla el número d'aquesta
+        if (current->street_name == street_name && current->house_number == num ){
+            return current;
+        }
+        current = current->next;
+    }
+    // si arribem aqui vol dir que cap numero coincideix
+    printf("El num %d no existeix a %s.\n", num, street_name);
+    printf("Nums disponibles: \n");
+
+    while (current != NULL){
+        if (current->street_name == street_name)
+        printf(" [%d]\n", current->house_number);
+    }
+
+    // Una vegada mostrats tots els números possibles, fem escollir un
+    int choice;
+    printf("Tria un número: ");
+    scanf("%d", &choice);
+
+    // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
+    HouseNode* current = head;
+    while (current != NULL){
+        if (current->street_name == street_name && current->house_number == choice) {
+            return current;
+        }
+        current = current->next;
+    }
+
+    // En cas de no trobar cap coïncidència, diem que el número no es vàlid
+    printf("Número invàlid.\n");
+    return NULL;
+}
+
+void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
 
     int posicio_origen;
     int num;
@@ -147,27 +174,35 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
         printf("Invalid option. Where are you? Address (1), Place (2) or Coordinate (3): ");
         scanf("%d", &posicio_origen);
     }
-    if (posicio_origen == 2 || posicio_origen == 3){
-        printf("Not implemented yet.\n");
-    }
-    
-    else{
+    if (posicio_origen == 1){
+
+        FILE* map_file = open_map_house(mapa);
+        if (map_file == NULL) return 1;
+
+        HouseNode* list_of_houses = fill_linkedlist(map_file);
+        fclose(map_file);
+
         printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
         scanf(" %[^\n]", street_name);
 
+        HouseNode* trobat = find_house_name(list_of_houses, street_name);
+        
         printf("Enter street number (e.g. \"138\"): ");
         scanf("%d", &num);
 
-        
+        HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
 
-
-        HouseNode* trobat = find_house(head, street_name, num);
-
-        if (trobat != NULL) {
+        if (final_house != NULL) {
             printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
             printf("Address not found.\n");
         }
+
     }
-    
+    else if(posicio_origen == 2){
+        //aqui va lo de places eric
+    }
+    else{
+        printf("Not implemented yet.\n"); 
+    }
 }
