@@ -13,10 +13,11 @@ typedef struct HouseNode {
     struct HouseNode* next; // Punter al següent node
 } HouseNode;
 
-FILE* ask_map ();
+FILE* open_map_house();
 HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon);
 void to_lowercase(char* original, char* dest);
 void expand_abbreviations(const char* original, char* dest);
 HouseNode* fill_linked_list_houses (FILE *fitxer);
-HouseNode* find_house(HouseNode* head, char* target_street, int target_number);
-void input_originposition(HouseNode* head);
+HouseNode* find_house_name(HouseNode* head, char* target_street);
+HouseNode* triar_num(HouseNode* head, char *street_name, int num);
+void input_originposition(char* map);

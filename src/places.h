@@ -17,7 +17,7 @@ typedef struct PlaceNode {
     struct PlaceNode* next; // Punter al següent node
 } PlaceNode;
 
-FILE* ask_map ();
+FILE* open_map_places();
 PlaceNode* add_Place(PlaceNode* head, char* PlaceName, char* general_id, char* specific_id, double lat, double lon);
 PlaceNode* fill_linked_list_places (FILE *fitxer);
-PlaceNode* find_Place(PlaceNode* head, char* target_place);
+PlaceNode* find_place(PlaceNode* head, char* target_place);

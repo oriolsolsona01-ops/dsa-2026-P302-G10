@@ -2,7 +2,7 @@
 #include "sample_lib.h"
 #define MAX_LEN 150
 
-FILE* open_map_places(char mapa){ 
+FILE* open_map_places(char* mapa){ 
     // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
 
@@ -64,7 +64,7 @@ PlaceNode* fill_linked_list_places (FILE *fitxer){
     return Places;
 }
 
-PlaceNode* find_Place(PlaceNode* head, char* target_place) {
+PlaceNode* find_place(PlaceNode* head, char* target_place) {
     PlaceNode* current = head;
     
     PlaceNode* top_3 [3] = {NULL, NULL, NULL};
