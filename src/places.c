@@ -1,15 +1,17 @@
 #include "places.h"
 #include "sample_lib.h"
+#define MAX_LEN 150
 
-FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
+FILE* ask_map_places (){ 
+    // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
-    char mapa[50];
+    char mapa[MAX_LEN];
     
     printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
     scanf("%s", mapa);
 
     //creem un string amb la ruta sencera del filename
-    char rutafinal [150];
+    char rutafinal [MAX_LEN];
     sprintf(rutafinal, "maps/%s/places.txt", mapa); //escriu tot el contingut a rutafinal
     
     FILE *fitxer = fopen(rutafinal, "r");
@@ -21,37 +23,54 @@ FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document 
         return fitxer; 
 }
 
-HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon) {
-    HouseNode* new_house = (HouseNode*)malloc(sizeof(HouseNode));
+PlaceNode* add_Place(PlaceNode* head, char* identifier, char* name, char* id, double lat, double lon) {
+    PlaceNode* new_Place = (PlaceNode*)malloc(sizeof(PlaceNode));
     
-    strcpy(new_house->street_name,street);
-    new_house->house_number = number;
-    new_house->lat = lat;
-    new_house->lon = lon;
+    // guardem el nom i la cadena de càracters que identifica el lloc
+    strcpy(new_Place->PlaceName, name);
+    strcpy(new_Place->identifier, identifier);
 
-    new_house->next = head;
-
-    return new_house;
-}
-
-HouseNode* fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
-        char street[100];
-        int number;
-        double lat;
-        double lon;
-        HouseNode* houses = NULL;
-
-        while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
-
-            houses = add_house(houses, street, number, lat, lon); 
-            
-        }
+    // i ara guardem els identificadors del tipus de lloc a una cadena que guarda el general i l'altra que guarda l'especific
+    char* split = strchr(identifier, ':');
+    if (split != NULL){                                        // en cas que existeixi el ":" que separa els tipus de llocs
+        int len_1 = split - identifier;                        // mirem la distancia des de l'inici fins al ":"
+        strncpy(newPlace->general_id, identifier, len_1);      // ho copiem a general_id
+        newPlace->general_id[len_1] = '\0';                    // i afegim '\0' al final
+        strcpy(newPlace->specific_id, split+1);                // finalment copiem el que queda a specific_id
+    }
+    else{                                                      // d'altra banda, si no hi ha cap ":"
+        strcpy(newPlace->general_id, identifier);              // copiem tot l'identifiacor a general_id
+        strcpy(newPlace->specific_id, "");                     // i deixem specific_id buit
     }
 
-HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
-    HouseNode* current = head;
+    new_Place->lat = lat;
+    new_Place->lon = lon;
+    new_Place->next = head;
+
+    return new_Place;
+}
+
+PlaceNode* fill_linkedlist (FILE *fitxer){ 
+    //cridem a la funció add Place llegeix la info del document i la posa cada node
+    char identifier[MAX_LEN];
+    char name[MAX_LEN];
+    char id[MAX_LEN];
+    double lat;
+    double lon;
+    PlaceNode* Places = NULL;
+
+    while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",identifier, name, id, &lat, &lon) == 5) {
+
+        Places = add_Place(Places, identifier, name, id, lat, lon); 
+        
+    }
+    return Places
+}
+
+PlaceNode* find_Place(PlaceNode* head, char* target_street, int target_number) {
+    PlaceNode* current = head;
     
-    HouseNode* best_match = NULL;
+    PlaceNode* best_match = NULL;
     int min_distance = 999999;
 
     while (current != NULL) {
@@ -59,7 +78,7 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
         int dist = LevenshteinDistance(current->street_name, target_street);
 
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
-        if (dist == 0 && current->house_number == target_number) {
+        if (dist == 0 && current->Place_number == target_number) {
             return current;
         }
 
@@ -76,7 +95,7 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
     return best_match;
 }
 
-void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
+void input_originposition(PlaceNode* head){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
 
     int posicio_origen;
     int num;
@@ -102,7 +121,7 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
         scanf("%d", &num);
         //cal trobar les coordenades un cop tenint aquestes dades amb el nom i num amb fscanf
 
-        HouseNode* trobat = find_house(head, street_name, num);
+        PlaceNode* trobat = find_Place(head, street_name, num);
 
         if (trobat != NULL) {
             printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
