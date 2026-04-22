@@ -94,7 +94,6 @@ PlaceNode* find_Place(PlaceNode* head, char* target_place) {
                     break;
                 }
             }
-            
         }
         current = current->next;
     }

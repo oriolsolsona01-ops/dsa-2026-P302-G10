@@ -1,9 +1,9 @@
 #include "houses.h"
 #include "sample_lib.h"
 
-FILE* open_map_house(char mapa){ // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
+FILE* open_map_house(char mapa){ 
+    // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
-
 
     //creem un string amb la ruta sencera del filename
     char rutafinal [150];
@@ -14,8 +14,7 @@ FILE* open_map_house(char mapa){ // tasca 1 + nota 1 (la funció retorna el punt
         printf("Error: No s'ha pogut obrir el fitxer.\n");
         return NULL;
     }
-
-        return fitxer; 
+    return fitxer; 
 }
 
 HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon) {
@@ -31,7 +30,8 @@ HouseNode* add_house(HouseNode* head, char* street, int number, double lat, doub
     return new_house;
 }
 
-HouseNode* fill_linked_list_houses (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
+HouseNode* fill_linked_list_houses (FILE *fitxer){ 
+    //cridem a la funció add house llegeix la info del document i la posa cada node
     char street[100];
     int number;
     double lat;
@@ -41,7 +41,6 @@ HouseNode* fill_linked_list_houses (FILE *fitxer){ //cridem a la funció add hou
     while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
 
         houses = add_house(houses, street, number, lat, lon); 
-        
     }
     return houses;
 }
@@ -91,8 +90,8 @@ void expand_abbreviations(const char* original, char* dest) {
 HouseNode* find_house_name(HouseNode* head, char* target_street) {
     HouseNode* current = head;
     
-    HouseNode* best_match = NULL;
-    int min_distance = 999999;
+    HouseNode* top_3 [3] = {NULL, NULL, NULL};
+    int dist_3[3] = {999999, 999999, 999999};
 
     char lower_street[100];
     to_lowercase(target_street,lower_street);
@@ -115,11 +114,39 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
         if (dist == 0) {
             return current;
         }
-        //aqui falta ficar el sorting
+        else{
+             //mirem si la house entra dins del top 3
+            for (int i = 0; i < 3; i++){
+                if (dist < dist_3[i]){
+                    // desplaçem els pitjors casos avall per fer lloc
+                    for (int j = 2; j > i; j--){
+                        dist_3[j] = dist_3[j-1];
+                        top_3[j] = top_3[j-1];
+                    }
+                    // i insertem el nou
+                    dist_3[i] = dist;
+                    top_3[i] = current;
+                    break;
+                }
+            }
+        }
+        current = current->next;
     }
+    //demanem a l'usuari que esculli la street a la qual està
+    int opcio;
+    printf ("You are in:\n");
+    printf ("1. %s.\n", top_3[0]->street_name);
+    printf ("2. %s.\n", top_3[1]->street_name);
+    printf ("3. %s.\n", top_3[2]->street_name);
+    scanf("%d", &opcio);
 
-    // sorting
-
+    // comprovem que la opcio és vàlida
+    if (opcio < 1 || opcio > 3){
+        printf ("Error! Choose a valid option.");
+        return NULL;
+    }
+    // si la opcio és vàlida retornem el place que hagi escollit l'usuari
+    else return top_3[opcio-1];
 }
 
 HouseNode* triar_num(HouseNode* head, char *street_name, int num){
