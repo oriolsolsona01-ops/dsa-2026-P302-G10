@@ -168,11 +168,13 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     printf("The number %d does not exist in %s.\n", num, street_name);
     printf("Available numbers: \n");
 
+    current = head;
     while (current != NULL){
         if (current->street_name == street_name)
-        printf(" [%d]\n", current->house_number);
+            printf("***[%d]***\n", current->house_number);
+        current = current-> next;
     }
-
+    
     // Una vegada mostrats tots els números possibles, fem escollir un
     int choice;
     printf("Choose a number: ");
