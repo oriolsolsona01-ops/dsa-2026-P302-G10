@@ -1,11 +1,12 @@
 #include "houses.h"
 #include "sample_lib.h"
 
-FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
+FILE* open_map_house(char mapa){ 
+    // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
     char mapa[50];
     
-    printf("Introduce the name of the map (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
+    printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
     scanf("%s", mapa);
 
     //creem un string amb la ruta sencera del filename
@@ -17,8 +18,7 @@ FILE* ask_map (){ // tasca 1 + nota 1 (la funció retorna el punter al document 
         printf("Error: The document could not be open.\n");
         return NULL;
     }
-
-        return fitxer; 
+    return fitxer; 
 }
 // en la funció anterior es demana a l'usuari el mapa i s'obra el fitxer corresponent
 
@@ -37,48 +37,110 @@ HouseNode* add_house(HouseNode* head, char* street, int number, double lat, doub
     // creem un nou node de manera dinàmica i l'omplim amb la info que toqui 
 }
 
-HouseNode* fill_linkedlist (FILE *fitxer){ //cridem a la funció add house llegeix la info del document i la posa cada node
-        char street[100];
-        int number;
-        double lat;
-        double lon;
-        HouseNode* houses = NULL;
+HouseNode* fill_linked_list_houses (FILE *fitxer){ 
+    //cridem a la funció add house llegeix la info del document i la posa cada node
+    char street[100];
+    int number;
+    double lat;
+    double lon;
+    HouseNode* houses = NULL;
 
-        while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
+    while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
 
             houses = add_house(houses, street, number, lat, lon); 
             
         }
         return houses;
-
-        // llegeix el fitxer línia per línia i crida add_house per omplir la llista enllaçada amb totes les cases del mapa.
     }
 
-HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
+
+void to_lowercase(char* original, char* dest) {
+    int i = 0;
+    while (original[i] != '\0') {
+        // Comprovem si és una lletra majúscula utilitzant el seu valor ASCII
+        if (original[i] >= 'A' && original[i] <= 'Z') {
+            dest[i] = original[i] + 32; // Sumem 32 per passar-la a minúscula
+        } else {
+            dest[i] = original[i]; // Si ja era minúscula, número o espai, es queda igual
+        }
+        i++;
+    }
+    dest[i] = '\0'; // Marquem el final de l'string
+}
+
+void expand_abbreviations(const char* original, char* dest) {
+    // Comprovem si els primers 3 caràcters són "c. "
+    if (strncmp(original, "c. ", 3) == 0) {
+        strcpy(dest, "carrer ");
+        strcat(dest, original + 3);
+    } 
+    // Comprovem Avinguda ("av. " -> 4 caràcters)
+    else if (strncmp(original, "av. ", 4) == 0) {
+        strcpy(dest, "avinguda ");
+        strcat(dest, original + 4);
+    } 
+    // Comprovem Passeig ("pg. " -> 4 caràcters)
+    else if (strncmp(original, "pg. ", 4) == 0) {
+        strcpy(dest, "passeig ");
+        strcat(dest, original + 4);
+    } 
+    // Comprovem Passatge ("ptge. " -> 6 caràcters)
+    else if (strncmp(original, "ptge. ", 6) == 0) {
+        strcpy(dest, "passatge ");
+        strcat(dest, original + 6); // Saltem els 6 caràcters de "ptge. "
+    } 
+    // Si no comença per cap abreviatura, simplement ho copiem tal qual
+    else {
+        strcpy(dest, original);
+    }
+}
+
+HouseNode* find_house_name(HouseNode* head, char* target_street) {
     HouseNode* current = head;
     // la funció el que va es buscar una casa en concret
 
     // 
     
-    HouseNode* best_match = NULL;
-    int min_distance = 999999;
+    HouseNode* top_3 [3] = {NULL, NULL, NULL};
+    int dist_3[3] = {999999, 999999, 999999};
+
+    char lower_street[100];
+    to_lowercase(target_street,lower_street);
+
+    char expanded_street[150];
+    expand_abbreviations(lower_street,expanded_street);
+
 
     while (current != NULL) {
+        char lower_current[100];
+        to_lowercase(current->street_name,lower_current);
+
+        char expanded_current[150];
+        expand_abbreviations(lower_current,expanded_current);
+
         // Calculem la distància d'ortografia
         int dist = LevenshteinDistance(current->street_name, target_street);
 
-        // Si troba el carrer i el num que es buscava (distància Levenshtein 0) ho retorna
-        // Si no, va guardant quina es la casa que te el nom de carrer més semblant (best_match) per si no hi ha cap coincidència exacta
+        // Si és una coincidència PERFECTA (distància 0) i el número quadra
         if (dist == 0 && current->house_number == target_number) {
             return current;
         }
-
-        // Si la distància és menor que el nostre rècord actual, actualitzem el rècord
-        if (dist < min_distance) {
-            min_distance = dist;
-            best_match = current;
+        else{
+             //mirem si la house entra dins del top 3
+            for (int i = 0; i < 3; i++){
+                if (dist < dist_3[i]){
+                    // desplaçem els pitjors casos avall per fer lloc
+                    for (int j = 2; j > i; j--){
+                        dist_3[j] = dist_3[j-1];
+                        top_3[j] = top_3[j-1];
+                    }
+                    // i insertem el nou
+                    dist_3[i] = dist;
+                    top_3[i] = current;
+                    break;
+                }
+            }
         }
-
         current = current->next;
     }
 
@@ -86,38 +148,22 @@ HouseNode* find_house(HouseNode* head, char* target_street, int target_number) {
     return best_match;
 }
 
-HouseNode* get_street_options(HouseNode* head, char* target_street) {
-    HouseNode* options_list = NULL; // creem el punter d'inici per a la nostra llista  incialment buida de suggeriments
-    HouseNode* current = head; // Creem un punter auxiliar per recorer la llista principal sense perdre la referència de l'inici.
-    // creem una llista nova només amb les cases que pertanyen a un carrer concrer per oferir alternatives quan el número de casa no coincideix amb el que buscava l'usuari
-
-    while (current != NULL) { // Comencem un bucle que anirà node per node fins que s'acabi la llista.
-        // Si el nom del carrer coincideix al 100%
-        if (strcmp(current->street_name, target_street) == 0) {
-            // Reutilitzem la unció add_house per afegir el node a la llista d'opcions
-            options_list = add_house(options_list, current->street_name, current->house_number, current->lat, current->lon);
-        }
-        current = current->next; // 
-    }
-    return options_list;
-}
-
 void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
 
     int posicio_origen;
     int num;
     char street_name[100];
-    // és el que veu l'usuari
 
+    printf("\n--- ORIGIN ---\n");
     printf("Where are you? Address (1), Place (2) or Coordinate (3): ");
-    scanf("%d", &posicio_origen); // ho guardem en la variable origen
+    scanf("%d", &posicio_origen);
 
     while (posicio_origen < 1 || posicio_origen > 3){
         printf("Invalid option. Where are you? Address (1), Place (2) or Coordinate (3): ");
         scanf("%d", &posicio_origen);
     }
     if (posicio_origen == 2 || posicio_origen == 3){
-        printf("Not implemented yet\n");
+        printf("Not implemented yet.\n");
     }
     
     else{
@@ -130,42 +176,14 @@ void input_originposition(HouseNode* head){ // tasca 2,3 i 4 (el paràmtre d'ent
         
 
 
-HouseNode* trobat = find_house(head, street_name, num); // cridem a la funcio a partir de la info que ens dona l'usuari
-//
-         if (trobat != NULL && strcmp(trobat->street_name, street_name) == 0 && trobat->house_number != num) {
-            
-            printf("\nEl número %d no existeix a %s.\n", num, street_name);
-            
-            // creem una llista on posarem les opcions de les possibles cases reals
- HouseNode* opcions = get_street_options(head, street_name);
-            
-            if (opcions != NULL) {
-                printf("Números disponibles: ");
-                HouseNode* temp = opcions;
-                while (temp != NULL) {
-                    printf("[%d] ", temp->house_number);
-                    temp = temp->next;
-                }
-                
-                printf("\nTria un número de la llista: ");
-                scanf("%d", &num);
-                
-                // 
-                trobat = find_house(head, street_name, num);
-                
-                // alliberem la memòria
-                free_list(opcions);
-            }
-        }
+        HouseNode* trobat = find_house(head, street_name, num);
 
-        
-        if (trobat != NULL && trobat->house_number == num) {
+        if (trobat != NULL) {
             printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
             printf("Address not found.\n");
         }
-    
-
     }
-
-
+    
+}
+void triar_num(street_name)
