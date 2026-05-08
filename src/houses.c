@@ -122,7 +122,7 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
         int dist = LevenshteinDistance(current->street_name, target_street);
 
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
-        if (dist == 0 && current->house_number == target_number) {
+        if (dist == 0) {
             return current;
         }
         else{
