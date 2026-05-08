@@ -14,20 +14,45 @@ FILE* open_map_streets(char* mapa){
 }
 
 StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, 
-int to, double to_lat, double to_lon, double len, char* name){
+                       int to, double to_lat, double to_lon, double len, char* name) {
 
     StreetNode* newStreet = (StreetNode*)malloc(sizeof(StreetNode));
-    // afegim a la nova street les dades de la intersecció inicial
+    if (newStreet == NULL) return head; // Seguretat si falla el malloc
+
+    // Afegim a la nova street les dades de la intersecció inicial
     newStreet->carrer.from_id = from;
     newStreet->carrer.from_lat = from_lat;
     newStreet->carrer.from_lon = from_lon;
-    // les de la intersecció final
+
+    // Les de la intersecció final
     newStreet->carrer.to_id = to;
     newStreet->carrer.to_lat = to_lat;
     newStreet->carrer.to_lon = to_lon;
-    // les generals
+    
     newStreet->carrer.lenght = len;
     strcpy(newStreet->carrer.street_name, name);
 
+    
+    newStreet->next = head; 
+
     return newStreet;
 }
+
+StreetNode* fill_linked_streets(FILE *fitxer) { 
+    int from, to;
+    double from_lat, from_lon, to_lat, to_lon, len;
+    char name[100];
+    StreetNode* streets = NULL;
+
+    while (fscanf(fitxer, "%[^\n],%d,%lf,%lf,%d,%lf,%lf,%lf", 
+           &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len, name) == 8) {
+
+        // Cridem a add_street passant-li el "cap" actual (streets)
+        streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 
+    }
+
+    return streets; 
+}
+
+
+
