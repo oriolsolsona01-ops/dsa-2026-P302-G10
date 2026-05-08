@@ -7,7 +7,7 @@ FILE* open_map_places(char* mapa){
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
 
     //creem un string amb la ruta sencera del filename
-    char rutafinal [150];
+    char rutafinal [MAX_LEN];
     sprintf(rutafinal, "maps/%s/places.txt", mapa); //escriu tot el contingut a rutafinal
     
     FILE *fitxer = fopen(rutafinal, "r");
@@ -96,6 +96,9 @@ PlaceNode* find_place(PlaceNode* head, char* target_place) {
             }
         }
         current = current->next;
+    }
+    if (dist_3[0] > 15){
+        return NULL;
     }
     //demanem a l'usuari que esculli el place al que està
     int opcio;
