@@ -4,6 +4,10 @@
 FILE* open_map_house(char* mapa){ 
     // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
     // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
+    char mapa[50];
+    
+    printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
+    scanf("%s", mapa);
 
     //creem un string amb la ruta sencera del filename
     char rutafinal [150];
@@ -11,11 +15,12 @@ FILE* open_map_house(char* mapa){
     
     FILE *fitxer = fopen(rutafinal, "r");
     if (fitxer == NULL) {
-        printf("Error: No file found.\n");
+        printf("Error: No s'ha pogut obrir el fitxer.\n");
         return NULL;
     }
     return fitxer; 
 }
+// en la funció anterior es demana a l'usuari el mapa i s'obra el fitxer corresponent
 
 HouseNode* add_house(HouseNode* head, char* street, int number, double lat, double lon) {
     HouseNode* new_house = (HouseNode*)malloc(sizeof(HouseNode));
@@ -28,6 +33,8 @@ HouseNode* add_house(HouseNode* head, char* street, int number, double lat, doub
     new_house->next = head;
 
     return new_house;
+
+    // creem un nou node de manera dinàmica i l'omplim amb la info que toqui 
 }
 
 HouseNode* fill_linked_list_houses (FILE *fitxer){ 
@@ -40,10 +47,11 @@ HouseNode* fill_linked_list_houses (FILE *fitxer){
 
     while (fscanf(fitxer, "%[^,],%d,%lf,%lf\n",street, &number, &lat, &lon) == 4) {
 
-        houses = add_house(houses, street, number, lat, lon); 
+            houses = add_house(houses, street, number, lat, lon); 
+            
+        }
+        return houses;
     }
-    return houses;
-}
 
 
 void to_lowercase(char* original, char* dest) {
@@ -89,6 +97,9 @@ void expand_abbreviations(const char* original, char* dest) {
 
 HouseNode* find_house_name(HouseNode* head, char* target_street) {
     HouseNode* current = head;
+    // la funció el que va es buscar una casa en concret
+
+    // 
     
     HouseNode* top_3 [3] = {NULL, NULL, NULL};
     int dist_3[3] = {999999, 999999, 999999};
@@ -108,10 +119,10 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
         expand_abbreviations(lower_current,expanded_current);
 
         // Calculem la distància d'ortografia
-        int dist = LevenshteinDistance(expanded_current, expanded_street);
-        
+        int dist = LevenshteinDistance(current->street_name, target_street);
+
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
-        if (dist == 0) {
+        if (dist == 0 && current->house_number == target_number) {
             return current;
         }
         else{
@@ -132,12 +143,7 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
         }
         current = current->next;
     }
-    // en cas que la street no sigui al mapa escollit (hi hagi una distancia levenshtein superior a 5)
-    if (dist_3[0] > 5){
-        printf("This street was not found in this map!\n");
-        return NULL;
-    }
-    // si les street si existeix al mapa, demanem a l'usuari que esculli la street a la qual està
+    //demanem a l'usuari que esculli la street a la qual està
     int opcio;
     printf ("You are in:\n");
     printf ("1. %s.\n", top_3[0]->street_name);
@@ -159,14 +165,14 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     HouseNode* current = head;
     while (current != NULL){
         // Mirem si coincideix i, en cas de que si, presentem per pantalla el número d'aquesta
-        if (strcmp(current->street_name, street_name) == 0 && current->house_number == num ){
+        if (current->street_name == street_name && current->house_number == num ){
             return current;
         }
         current = current->next;
     }
     // si arribem aqui vol dir que cap numero coincideix
-    printf("The number %d does not exist in %s.\n", num, street_name);
-    printf("Available numbers: \n");
+    printf("El num %d no existeix a %s.\n", num, street_name);
+    printf("Nums disponibles: \n");
 
     current = head;
     while (current != NULL){
@@ -177,11 +183,11 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     
     // Una vegada mostrats tots els números possibles, fem escollir un
     int choice;
-    printf("Choose a number: ");
+    printf("Tria un número: ");
     scanf("%d", &choice);
 
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
-    current = head;
+    HouseNode* current = head;
     while (current != NULL){
         if (current->street_name == street_name && current->house_number == choice) {
             return current;
@@ -190,6 +196,6 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     }
 
     // En cas de no trobar cap coïncidència, diem que el número no es vàlid
-    printf("Number unavailable.\n");
+    printf("Número invàlid.\n");
     return NULL;
 }
