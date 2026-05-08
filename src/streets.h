@@ -27,6 +27,16 @@ typedef struct StreetNode{
     StreetNode* next;
 } StreetNode;
 
+typedef struct Position {
+  double lat;
+  double lon;
+} Position;
+
 FILE* open_map_streets(char* mapa);
-StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, int to, double to_lat, double to_lon, double len, char* name){
+StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, int to, double to_lat, double to_lon, double len, char* name);
+StreetNode* fill_linked_streets(FILE *fitxer);
+double toRadians(double degree);
+double toDegrees(double radians);
+double haversine(Position posA, Position posB);
+Position midpoint(Position a, Position b);
 // falten funcions de streets

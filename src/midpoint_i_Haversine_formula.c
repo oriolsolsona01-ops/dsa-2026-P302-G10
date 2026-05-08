@@ -1,7 +1,6 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-
 #define EARTH_RADIUS 6371.0
 
 typedef struct position {
@@ -11,6 +10,10 @@ typedef struct position {
 
 double toRadians(double degree) {
     return degree * (M_PI / 180.0);
+}
+
+double toDegrees(double radians) {
+    return radians * (180.0 / M_PI);
 }
 
 double haversine(Position posA, Position posB) {
@@ -27,19 +30,6 @@ double haversine(Position posA, Position posB) {
     return EARTH_RADIUS * c;
 }
 
-
-typedef struct position {
-  double lat;
-  double lon;
-} Position;
-
-double toDegrees(double radians) {
-    return radians * (180.0 / M_PI);
-}
-
-double toRadians(double degree) {
-    return degree * (M_PI / 180.0);
-}
 
 Position midpoint(Position a, Position b) {
     double lat1 = toRadians(a.lat);
