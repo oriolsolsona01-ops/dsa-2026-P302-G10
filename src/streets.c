@@ -25,7 +25,9 @@ int to, double to_lat, double to_lon, double len, char* name){
     newStreet->carrer.to_id = to;
     newStreet->carrer.to_lat = to_lat;
     newStreet->carrer.to_lon = to_lon;
-
+    // les generals
+    newStreet->carrer.lenght = len;
     strcpy(newStreet->carrer.street_name, name);
 
+    return newStreet;
 }
