@@ -25,13 +25,13 @@ StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_
 
     // Afegim a la nova street les dades de la intersecció inicial
     newStreet->carrer.from_id = from;
-    newStreet->carrer.from_lat = from_lat;
-    newStreet->carrer.from_lon = from_lon;
+    newStreet->carrer.from_position.lat = from_lat;
+    newStreet->carrer.from_position.lon = from_lon;
 
     // Les de la intersecció final
     newStreet->carrer.to_id = to;
-    newStreet->carrer.to_lat = to_lat;
-    newStreet->carrer.to_lon = to_lon;
+    newStreet->carrer.to_position.lat = to_lat;
+    newStreet->carrer.to_position.lon = to_lon;
     
     newStreet->carrer.lenght = len;
     strcpy(newStreet->carrer.street_name, name);
@@ -108,4 +108,18 @@ Position midpoint(Position a, Position b) {
     return mid;
 }
 
-StreetNode* find_closest_street(Position* posicio_user, StreetNode* head))
+StreetNode* find_closest_street(Position posicio_user, StreetNode* head){
+    StreetNode* current = head;
+    StreetNode* closest = NULL;
+    double min = 999999;
+    while(current != NULL){
+        Position mid = midpoint(current->carrer.from_position , current->carrer.to_position);
+        double distance = haversine(posicio_user,mid);
+        if (distance < min){
+            min = distance;
+            closest = current;
+        }
+        current = current->next;
+    }
+    return closest;
+}
