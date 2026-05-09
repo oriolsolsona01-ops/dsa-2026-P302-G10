@@ -1,4 +1,5 @@
 #include "sample_lib.h"
+#include "streets.h"
 #include "places.h"
 #include "houses.h"
 #include <dirent.h>
@@ -73,9 +74,16 @@ void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada 
         } else {
             printf("Place not found.\n");
         }
+        Position* posicio_place = (Position*)malloc(sizeof(Position));
+        
+        position_place.lat = trobat->lat;
+        position_place.lon = trobat->lon;
+
+        StreetNode* closest_street = 
+        
     }
     else{
-        printf("Not implemented yet.\n"); 
+        printf("Not implemented yet!!\n");
     }
 }
 
