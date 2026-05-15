@@ -12,7 +12,7 @@ void createaleak() {
   printf("Allocated leaking string: %s", foo);
 }
 
-void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
+Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada serà el punter al doc)
 
     int posicio_origen;
     int num;
@@ -51,10 +51,17 @@ void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada 
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
 
         if (final_house != NULL) {
-            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
+            printf("Found at (%f, %f)\n", final_house->lat, final_house->lon);
         } else {
             printf("Address not found.\n");
         }
+
+        Position* posicio_place = (Position*)malloc(sizeof(Position));
+        
+        posicio_place->lat = final_house->lat;
+        posicio_place->lon = final_house->lon;
+
+        return posicio_place;
 
     }
     else if(posicio_origen == 2){
@@ -76,16 +83,33 @@ void input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'entrada 
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
-        position_place.lat = trobat->lat;
-        position_place.lon = trobat->lon;
+        posicio_place->lat = trobat->lat;
+        posicio_place->lon = trobat->lon;
 
-        StreetNode* closest_street = 
+        return posicio_place;
         
     }
     else{
         printf("Not implemented yet!!\n");
     }
 }
+
+Street* input_closest_street(Position* posicio_origen, char* mapa){
+    FILE* street_file = open_map_streets(mapa);
+        if (street_file == NULL) return;
+
+        StreetNode* list_of_streets = fill_linked_streets(street_file);
+        fclose(street_file);
+
+        Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
+
+        printf("Closest street: %c", closest_street->street_name);
+        printf("Between %d (%lf, %lf) and %d (%lf, %lf)",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
+
+        return closest_street;
+
+}
+
 
 char* choose_map(){
     int mapa;
@@ -112,8 +136,9 @@ int main() {
 
     printf("*****************\nWelcome to DSA!\n*****************\n");
     char* mapa = choose_map();
-    input_originposition(mapa);
-
+    Position* posicio_origen = input_originposition(mapa);
+    Street* closest_street = input_closest_street(posicio_origen,mapa);
 
     return 0;
+
 }

@@ -39,5 +39,5 @@ double toRadians(double degree);
 double toDegrees(double radians);
 double haversine(Position posA, Position posB);
 Position midpoint(Position a, Position b);
-StreetNode* find_closest_street(Position posicio_user, StreetNode* head);
+Street* find_closest_street(Position* posicio_user, StreetNode* head);
 // falten funcions de streets

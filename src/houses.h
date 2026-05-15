@@ -20,4 +20,4 @@ void expand_abbreviations(const char* original, char* dest);
 HouseNode* fill_linked_list_houses (FILE *fitxer);
 HouseNode* find_house_name(HouseNode* head, char* target_street);
 HouseNode* triar_num(HouseNode* head, char *street_name, int num);
-void input_originposition(char* map);
+

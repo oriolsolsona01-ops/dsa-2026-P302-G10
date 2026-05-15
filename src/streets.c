@@ -108,16 +108,16 @@ Position midpoint(Position a, Position b) {
     return mid;
 }
 
-StreetNode* find_closest_street(Position posicio_user, StreetNode* head){
+Street* find_closest_street(Position* posicio_user, StreetNode* head){
     StreetNode* current = head;
-    StreetNode* closest = NULL;
+    Street* closest = NULL;
     double min = 999999;
     while(current != NULL){
         Position mid = midpoint(current->carrer.from_position , current->carrer.to_position);
-        double distance = haversine(posicio_user,mid);
+        double distance = haversine(*posicio_user,mid);
         if (distance < min){
             min = distance;
-            closest = current;
+            *closest = current->carrer;
         }
         current = current->next;
     }
