@@ -21,7 +21,7 @@ typedef struct Street{
 
     // dades generals del carrer
     double lenght;
-    char* street_name[100];
+    char street_name[100];
 } Street;
 
 // estructura d'un node d'un carrer
@@ -40,4 +40,5 @@ double toDegrees(double radians);
 double haversine(Position posA, Position posB);
 Position midpoint(Position a, Position b);
 Street* find_closest_street(Position* posicio_user, StreetNode* head);
+StreetNode* find_connected_streets(Street* current_street, StreetNode* head);
 // falten funcions de streets

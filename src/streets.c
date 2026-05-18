@@ -126,12 +126,27 @@ Street* find_closest_street(Position* posicio_user, StreetNode* head){
     return closest;
 }
 
-void fill_hashmap_from_streets(StreetNode* streets_head, ...) {
-    StreetNode* current = streets_head;
+StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
+    StreetNode* current = head;
+    StreetNode* connected = NULL;
+
     while (current != NULL) {
-        // CLAU: Afegim dues vegades!
-        add_street_to_intersection(map, current->carrer.from_id, current->carrer);
-        add_street_to_intersection(map, current->carrer.to_id, current->carrer);
+        if ((current->carrer.from_id == current_street->from_id ||
+             current->carrer.from_id == current_street->to_id)  ||
+            (current->carrer.to_id   == current_street->from_id ||
+             current->carrer.to_id   == current_street->to_id)) {
+
+            connected = add_street(connected,
+                                   current->carrer.from_id,
+                                   current->carrer.from_position.lat,
+                                   current->carrer.from_position.lon,
+                                   current->carrer.to_id,
+                                   current->carrer.to_position.lat,
+                                   current->carrer.to_position.lon,
+                                   current->carrer.lenght,
+                                   current->carrer.street_name);
+        }
         current = current->next;
     }
-}
+    return connected;
+} 
