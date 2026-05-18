@@ -58,6 +58,8 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
     return streets; 
 }
 
+
+
 double toRadians(double degree) {
     return degree * (M_PI / 180.0);
 }
@@ -122,4 +124,14 @@ Street* find_closest_street(Position* posicio_user, StreetNode* head){
         current = current->next;
     }
     return closest;
+}
+
+void fill_hashmap_from_streets(StreetNode* streets_head, ...) {
+    StreetNode* current = streets_head;
+    while (current != NULL) {
+        // CLAU: Afegim dues vegades!
+        add_street_to_intersection(map, current->carrer.from_id, current->carrer);
+        add_street_to_intersection(map, current->carrer.to_id, current->carrer);
+        current = current->next;
+    }
 }

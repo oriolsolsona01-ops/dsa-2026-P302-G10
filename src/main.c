@@ -101,6 +101,10 @@ Street* input_closest_street(Position* posicio_origen, char* mapa){
         StreetNode* list_of_streets = fill_linked_streets(street_file);
         fclose(street_file);
 
+        HashMap* hashmap = fill_hashmap_from_streets(list_of_streets, 1000);
+
+        StreetNode* connected = get_streets_at_intersection(hashmap, 21638867);
+
         Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
 
         printf("Closest street: %c", closest_street->street_name);
