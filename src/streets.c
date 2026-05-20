@@ -58,8 +58,7 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
     return streets; 
 }
 
-
-
+// ********** OPERACIONS MATEMÀTIQUES **********
 double toRadians(double degree) {
     return degree * (M_PI / 180.0);
 }
@@ -110,6 +109,7 @@ Position midpoint(Position a, Position b) {
     return mid;
 }
 
+
 Street* find_closest_street(Position* posicio_user, StreetNode* head){
     StreetNode* current = head;
     Street* closest = NULL;
@@ -125,6 +125,8 @@ Street* find_closest_street(Position* posicio_user, StreetNode* head){
     }
     return closest;
 }
+
+//********** CERCA LINEAL DE CONNECTED STREET **********
 
 StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
     StreetNode* current = head;
@@ -149,4 +151,26 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
         current = current->next;
     }
     return connected;
-} 
+}
+
+//********** CERCA PER HASH MAP DE CLOSEST STREET **********
+
+Hash_map* create_hashmap (int capacitat_inicial){                           
+
+}
+
+// omplir hash map de streets a paartir d'una llista d'streets
+Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capacity){
+
+}
+
+// trobar les streets connectades a una intersecció
+StreetNode* get_streets_at_intersection(Hash_map* map, int intersection_id){
+
+}
+
+// alliberar memoria del hash map
+void free_hashmap(Hash_map* map){
+
+
+}
