@@ -94,7 +94,88 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
     }
     return NULL;
 }
+Position* input_destinationposition(char* mapa){ 
 
+    int posicio_destí;
+    int num;
+    char street_name[100];
+    char place_name[100];
+
+    printf("\n--- DESTINATION ---\n");
+    printf("Where do you want to go? Address (1), Place (2) or Coordinate (3): ");
+    scanf("%d", &posicio_destí);
+
+    while (posicio_destí < 1 || posicio_destí > 3){
+        // netejem posicio_desti
+        while(getchar() != '\n');
+        // i tornem a preguntar
+        printf("Where do you want to go? Address (1), Place (2) or Coordinate (3): ");
+        scanf("%d", &posicio_destí);
+    }
+    if (posicio_destí == 1){
+
+        FILE* map_file = open_map_house(mapa);
+        if (map_file == NULL) return NULL;
+
+        HouseNode* list_of_houses = fill_linked_list_houses(map_file);
+        fclose(map_file);
+
+        printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
+        scanf(" %[^\n]", street_name);
+
+        HouseNode* trobat = find_house_name(list_of_houses, street_name);
+        if (trobat == NULL) return NULL;
+        else{
+            printf("Enter street number (e.g. \"138\"): ");
+            scanf("%d", &num);
+        }
+
+        HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
+
+        if (final_house != NULL) {
+            printf("Found at (%f, %f)\n", final_house->lat, final_house->lon);
+        } else {
+            printf("Address not found.\n");
+        }
+
+        Position* posicio_place = (Position*)malloc(sizeof(Position));
+        
+        posicio_place->lat = final_house->lat;
+        posicio_place->lon = final_house->lon;
+
+        return posicio_place;
+
+    }
+    else if(posicio_destí == 2){
+        FILE* map_file = open_map_places(mapa);
+        if (map_file == NULL) return NULL;
+
+        PlaceNode* list_of_places = fill_linked_list_places(map_file);
+        fclose(map_file);
+
+        printf("Enter place name (e.g. \"Universitat Pompeu Fabra–Campus del Poblenou\" or \"L'Illa Diagonal\"): ");
+        scanf(" %[^\n]", place_name);
+
+        PlaceNode* trobat = find_place(list_of_places, place_name);
+
+        if (trobat != NULL) {
+            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
+        } else {
+            printf("Place not found.\n");
+        }
+        Position* posicio_place = (Position*)malloc(sizeof(Position));
+        
+        posicio_place->lat = trobat->lat;
+        posicio_place->lon = trobat->lon;
+
+        return posicio_place;
+        
+    }
+    else{
+        printf("Not implemented yet!!\n");
+    }
+    return NULL;
+}
 //**********HELPER FUNCTION**********
 void show_connected_streets (Hash_map* hash_map, Street* closest_street){
     printf("From this street segment, you can go to:\n");
@@ -169,8 +250,12 @@ int main() {
     // i mostrem el connexos
     show_connected_streets(map, closest_street);
     free_hashmap(map);
-    return 0;
 
+    Position* posicio_desti = input_destinationposition(mapa);
+    Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
+    
+    return 0;
+//recordar fer free de tot
 }
 
 
