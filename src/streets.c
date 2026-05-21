@@ -1,4 +1,5 @@
 #include "streets.h"
+#include <math.h>
 #define MAX_LEN 150
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -49,7 +50,7 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
     StreetNode* streets = NULL;
 
     while (fscanf(fitxer,"%[^,], %d,%lf,%lf,%d,%lf,%lf,%lf", 
-           &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len, name) == 8) {
+           name, &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len) == 8) {
 
         // Cridem a add_street passant-li el "cap" actual (streets)
         streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 

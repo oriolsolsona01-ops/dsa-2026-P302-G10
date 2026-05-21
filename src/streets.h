@@ -27,7 +27,7 @@ typedef struct Street{
 // estructura d'un node d'un carrer
 typedef struct StreetNode{
     struct Street carrer;
-    StreetNode* next;
+    struct StreetNode* next;
 } StreetNode;
 
 // ********** ESTRUCTURES PEL HASH MAP **********

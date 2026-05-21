@@ -33,7 +33,7 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
     if (posicio_origen == 1){
 
         FILE* map_file = open_map_house(mapa);
-        if (map_file == NULL) return;
+        if (map_file == NULL) return NULL;
 
         HouseNode* list_of_houses = fill_linked_list_houses(map_file);
         fclose(map_file);
@@ -42,7 +42,7 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
         scanf(" %[^\n]", street_name);
 
         HouseNode* trobat = find_house_name(list_of_houses, street_name);
-        if (trobat == NULL) return;
+        if (trobat == NULL) return NULL;
         else{
             printf("Enter street number (e.g. \"138\"): ");
             scanf("%d", &num);
@@ -66,7 +66,7 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
     }
     else if(posicio_origen == 2){
         FILE* map_file = open_map_places(mapa);
-        if (map_file == NULL) return;
+        if (map_file == NULL) return NULL;
 
         PlaceNode* list_of_places = fill_linked_list_places(map_file);
         fclose(map_file);
@@ -92,53 +92,40 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
     else{
         printf("Not implemented yet!!\n");
     }
+    return NULL;
 }
 
-Street* input_closest_street(Position* posicio_origen, char* mapa){
-    FILE* street_file = open_map_streets(mapa);
-        if (street_file == NULL) return;
-
-        StreetNode* list_of_streets = fill_linked_streets(street_file);
-        fclose(street_file);
-        
-        // trobem el carrer més proper
-        Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
-        // i mostem el text per pantalla
-        printf("Closest street: %c\n", closest_street->street_name);
-        printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
-
-        // ara busquem els carrers connectats al més proper
-        // fem el hash map
-        Hash_map* hash_map = fill_hashmap_from_streets(list_of_streets, 1024);
-        // i cridem la funció que mostra el carrers connexos a aquest
-        show_connected_streets(hash_map, closest_street);
-        // finalment alliberem el hash map 
-        free_hashmap(hash_map);
-
-        // i retornem el carrer més proxim
-        return closest_street;
-
-}
-
+//**********HELPER FUNCTION**********
 void show_connected_streets (Hash_map* hash_map, Street* closest_street){
     printf("From this street segment, you can go to:\n");
-    printf("    - %c\n", closest_street->street_name);
+    printf("    - %s\n", closest_street->street_name);
     printf("        Which is connected to:\n");
     // ara busquem els carrers connectats al més proper i els mostrem
     // busquem els carrers conenctats a la intersecció inicial
-    StreetNode* connected = get_streets_at_intersection(hash_map, closest_street->from_id);
-    while (connected != NULL){
-        printf("         - %c\n", connected->carrer.street_name);
-        connected = connected->next;
+    StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
+    while (connected_1 != NULL){
+        printf("         - %s\n", connected_1->carrer.street_name);
+        connected_1 = connected_1->next;
     }
     // i els carrers connectats a la intersecció final
-    StreetNode* connected = get_streets_at_intersection(hash_map, closest_street->to_id);
-    while (connected != NULL){
-        printf("         - %c\n", connected->carrer.street_name);
-        connected = connected->next;
+    StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
+    while (connected_2 != NULL){
+        printf("         - %s\n", connected_2->carrer.street_name);
+        connected_1 = connected_1->next;
     }
 }
 
+Street* input_closest_street(Position* posicio_origen, StreetNode* list_of_streets){
+    // trobem el carrer més proper
+    Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
+    // i mostem el text per pantalla
+    printf("Closest street: %s\n", closest_street->street_name);
+    printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
+
+    // i retornem el carrer més proxim
+    return closest_street;
+
+}
 
 char* choose_map(){
     int mapa;
@@ -166,8 +153,22 @@ int main() {
     printf("*****************\nWelcome to DSA!\n*****************\n");
     char* mapa = choose_map();
     Position* posicio_origen = input_originposition(mapa);
-    Street* closest_street = input_closest_street(posicio_origen,mapa);
-
+    
+    // busquem la el carrer més proper
+    FILE* street_file = open_map_streets(mapa);
+    if (street_file == NULL) return 0;
+    StreetNode* list_of_streets = fill_linked_streets(street_file);
+    Street* closest_street = input_closest_street(posicio_origen,list_of_streets);
+    fclose(street_file);
+    
+    // fem la linked list de carrers
+    
+    
+    // creem el hash map amb la llista de carrers
+    Hash_map* map = fill_hashmap_from_streets(list_of_streets, 1024);
+    // i mostrem el connexos
+    show_connected_streets(map, closest_street);
+    free_hashmap(map);
     return 0;
 
 }
