@@ -101,16 +101,42 @@ Street* input_closest_street(Position* posicio_origen, char* mapa){
         StreetNode* list_of_streets = fill_linked_streets(street_file);
         fclose(street_file);
         
-        Hash_map* h_map = fill_hashmap_from_streets(list_of_streets, 1024);
-        
-
+        // trobem el carrer més proper
         Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
+        // i mostem el text per pantalla
+        printf("Closest street: %c\n", closest_street->street_name);
+        printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
 
-        printf("Closest street: %c", closest_street->street_name);
-        printf("Between %d (%lf, %lf) and %d (%lf, %lf)",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
+        // ara busquem els carrers connectats al més proper
+        // fem el hash map
+        Hash_map* hash_map = fill_hashmap_from_streets(list_of_streets, 1024);
+        // i cridem la funció que mostra el carrers connexos a aquest
+        show_connected_streets(hash_map, closest_street);
+        // finalment alliberem el hash map 
+        free_hashmap(hash_map);
 
+        // i retornem el carrer més proxim
         return closest_street;
 
+}
+
+void show_connected_streets (Hash_map* hash_map, Street* closest_street){
+    printf("From this street segment, you can go to:\n");
+    printf("    - %c\n", closest_street->street_name);
+    printf("        Which is connected to:\n");
+    // ara busquem els carrers connectats al més proper i els mostrem
+    // busquem els carrers conenctats a la intersecció inicial
+    StreetNode* connected = get_streets_at_intersection(hash_map, closest_street->from_id);
+    while (connected != NULL){
+        printf("         - %c\n", connected->carrer.street_name);
+        connected = connected->next;
+    }
+    // i els carrers connectats a la intersecció final
+    StreetNode* connected = get_streets_at_intersection(hash_map, closest_street->to_id);
+    while (connected != NULL){
+        printf("         - %c\n", connected->carrer.street_name);
+        connected = connected->next;
+    }
 }
 
 

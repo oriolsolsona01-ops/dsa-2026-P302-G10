@@ -154,23 +154,107 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
 }
 
 //********** CERCA PER HASH MAP DE CLOSEST STREET **********
+//________HELPER FUNCTION 1________
+// busquem si una intersecció ja existeix dins el hashmap.
+int find_intersection_index(Hash_map* mapa, int intersection_id){
+    // recorrem la llista buscant si hi ha una intersection_id igual a la que ens dona l'usuari, en cas de ser aixi, retornem l'index d'aquest 
+    for (int i = 0; i < mapa->count; i++){
+        if (mapa->entries[i].intersection_id == intersection_id) return i;
+    }
+    // si arribem al final i no el trobem, retornem -1
+    return -1;
+}
 
-Hash_map* create_hashmap (int capacitat_inicial){                           
+//________HELPER FUNCTION 2________
+// afegim un carrer a una intersecció (o creem la intersecció si no existeix).
+void add_street_to_intersection(Hash_map* mapa, int intersection_id, Street street){
+    // mirem si la intersecció està al hash map
+    int index = find_intersection_index(mapa, intersection_id);
+    
+    // si no existeix la creem
+    if (index == -1){
+        // comprovem que el hash
+        if (mapa->count >= mapa->capacity){
+            // en cas que efectivament el hash map estigui ple, multipliquem per dos la seva capacitat
+            mapa->capacity *= 2;
+            mapa->entries = (hash_map_entry*)realloc(mapa->entries, mapa->capacity*(sizeof(hash_map_entry)));
+        }
+        // creem la nova entry buida a la posició actual
+        index = mapa->count;
+        mapa->entries[index].intersection_id = intersection_id;
+        mapa->entries[index].list_of_streets = NULL;
+        mapa->count ++;
+    }
+    // creem un nou street list amb elnou carrer a la primera posició
+    StreetNode* new_node = (StreetNode*)malloc(sizeof(StreetNode));
+    new_node->carrer = street;
+    new_node->next = mapa->entries[index].list_of_streets;
+    mapa->entries[index].list_of_streets = new_node;
+}
 
+//\\\\\\\\\\FUNCIONS ESSENCIALS//////////
+
+Hash_map* create_hashmap (int capacitat_inicial){    
+    // creem l'estructura hash map                       
+    Hash_map* hash_map = (Hash_map*)malloc(sizeof(Hash_map));
+    // creem l'array del hash map
+    hash_map->entries = (hash_map_entry*)malloc(capacitat_inicial * (sizeof(hash_map_entry)));
+
+    //assignem els valors del hash_map
+    hash_map->count = 0;
+    hash_map->capacity = capacitat_inicial;
+
+    // i el retornem
+    return hash_map;
 }
 
 // omplir hash map de streets a paartir d'una llista d'streets
 Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capacity){
+    // creem un hash map buit del tamany posat per l'usuari
+    Hash_map* mapa = create_hashmap(initial_capacity);
 
+    StreetNode* current = streets_head;
+    while (current != NULL){
+        // mentre current current no sigui null, cridem la helper function 2 per afegir el carrer a la intersecció
+        //(hem d'afegirlo tant a la intersecció inicial com a la final)
+        add_street_to_intersection(mapa, current->carrer.from_id, current->carrer);
+        add_street_to_intersection(mapa, current->carrer.to_id, current->carrer);
+        // un cop afegit, passem al següent
+        current = current->next;
+    }
+    return mapa;
 }
 
-// trobar les streets connectades a una intersecció
-StreetNode* get_streets_at_intersection(Hash_map* map, int intersection_id){
-
+// trobar les streets connectades a una intersecció (funció important)
+StreetNode* get_streets_at_intersection(Hash_map* mapa, int intersection_id){
+    // busquem si existeix la itersecció, i en cas de que si, a quin index està
+    int index = find_intersection_index(mapa, intersection_id);
+    // si no existeix retornem NULL
+    if (index == -1) return NULL;
+    // en canvi si sí que existeix, retornem la llista de carrers corresponent a l'intersecció
+    return mapa->entries[index].list_of_streets;
 }
 
-// alliberar memoria del hash map
-void free_hashmap(Hash_map* map){
-
-
+// finalment alliberem la memoria guardad pel hash map
+void free_hashmap(Hash_map* mapa){
+    // si el mapa ja es buit no fem res
+    if (mapa == NULL) return;
+    // per cada entry (desde la 0 fins la numero count (fa tantes iteracions com entrades hi hagi, no més))
+    for (int i = 0; i < mapa->count; i++){
+        // creem un punter "current" que apunti al primer de la llista de carrers de la entry
+        StreetNode* current = mapa->entries[i].list_of_streets;
+        // mentre hi hagi carrers
+        while (current != NULL){
+            // guardem l'actual a un temporal
+            StreetNode* temp = current;
+            // passem al següent
+            current = current->next;
+            // i alliberem el temporal
+            free(temp);
+        }
+    }
+    // alliberem l'array d'entries (el "(hash_map_entry*)malloc(capacitat_inicial * (sizeof(hash_map_entry)))")
+    free(mapa->entries);
+    // i alliberem l'estructura del hash map
+    free(mapa);
 }
