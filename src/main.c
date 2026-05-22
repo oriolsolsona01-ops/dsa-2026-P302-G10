@@ -2,6 +2,7 @@
 #include "streets.h"
 #include "places.h"
 #include "houses.h"
+#include "bfs.h"
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -192,7 +193,7 @@ void show_connected_streets (Hash_map* hash_map, Street* closest_street){
     StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
     while (connected_2 != NULL){
         printf("         - %s\n", connected_2->carrer.street_name);
-        connected_1 = connected_1->next;
+        connected_2 = connected_2->next;
     }
 }
 
@@ -253,8 +254,20 @@ int main() {
 
     Position* posicio_desti = input_destinationposition(mapa);
     Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
-    
+
+    Path* cami = BFS(map, closest_street, closest_street_desti);
+
+    if (cami == NULL) {
+        printf("No s'ha trobat cap camí.\n");
+    } else {
+        printf("\nPath found (%d segments):\n", cami->length);
+        for (int i = 0; i < cami->length; i++) {
+            printf("  %d. %s\n", i + 1, cami->streets[i].street_name);
+        }
+        free(cami);
+    }
     return 0;
+
 //recordar fer free de tot
 }
 

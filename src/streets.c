@@ -50,7 +50,7 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
     StreetNode* streets = NULL;
 
     while (fscanf(fitxer,"%[^,], %d,%lf,%lf,%d,%lf,%lf,%lf", 
-           name, &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len) == 8) {
+        name, &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len) == 8) {
 
         // Cridem a add_street passant-li el "cap" actual (streets)
         streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 
