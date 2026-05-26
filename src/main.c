@@ -110,7 +110,6 @@ Street* input_closest_street(Position* posicio_origen, char* mapa){
 
 }
 
-
 char* choose_map(){
     int mapa;
     printf("Choose a map name:\n(1) -> xs_1\n(2) -> xs_2\n(3) -> md_1\n(4) -> lg_1\n(5) -> xl_1\n(6) -> 2xl_1\n");
@@ -142,5 +141,3 @@ int main() {
     return 0;
 
 }
-
-
