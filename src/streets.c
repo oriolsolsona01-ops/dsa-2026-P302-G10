@@ -18,8 +18,8 @@ FILE* open_map_streets(char* mapa){
     return fitxer; 
 }
 
-StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, 
-                       int to, double to_lat, double to_lon, double len, char* name) {
+StreetNode* add_street(StreetNode* head, long long from, double from_lat, double from_lon, 
+                       long long to, double to_lat, double to_lon, double len, char* name) {
 
     StreetNode* newStreet = (StreetNode*)malloc(sizeof(StreetNode));
     if (newStreet == NULL) return head; // Seguretat si falla el malloc
@@ -44,13 +44,14 @@ StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_
 }
 
 StreetNode* fill_linked_streets(FILE *fitxer) { 
-    int from, to;
+    long long from, to;
     double from_lat, from_lon, to_lat, to_lon, len;
     char name[100];
     StreetNode* streets = NULL;
 
-    while (fscanf(fitxer,"%[^,], %d,%lf,%lf,%d,%lf,%lf,%lf", 
-        name, &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len) == 8) {
+   
+while (fscanf(fitxer, "%lld,%lf,%lf,%lld,%lf,%lf,%lf,%[^\n]",
+        &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len, name) == 8) {
 
         // Cridem a add_street passant-li el "cap" actual (streets)
         streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 
@@ -58,6 +59,7 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
 
     return streets; 
 }
+
 
 // ********** OPERACIONS MATEMÀTIQUES **********
 double toRadians(double degree) {
@@ -113,7 +115,7 @@ Position midpoint(Position a, Position b) {
 
 Street* find_closest_street(Position* posicio_user, StreetNode* head){
     StreetNode* current = head;
-    Street* closest = NULL;
+    Street* closest = (Street*)malloc(sizeof(Street));
     double min = 999999;
     while(current != NULL){
         Position mid = midpoint(current->carrer.from_position , current->carrer.to_position);
@@ -157,7 +159,7 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
 //********** CERCA PER HASH MAP DE CLOSEST STREET **********
 //________HELPER FUNCTION 1________
 // busquem si una intersecció ja existeix dins el hashmap.
-int find_intersection_index(Hash_map* mapa, int intersection_id){
+int find_intersection_index(Hash_map* mapa, long long intersection_id){
     // recorrem la llista buscant si hi ha una intersection_id igual a la que ens dona l'usuari, en cas de ser aixi, retornem l'index d'aquest 
     for (int i = 0; i < mapa->count; i++){
         if (mapa->entries[i].intersection_id == intersection_id) return i;
@@ -168,7 +170,7 @@ int find_intersection_index(Hash_map* mapa, int intersection_id){
 
 //________HELPER FUNCTION 2________
 // afegim un carrer a una intersecció (o creem la intersecció si no existeix).
-void add_street_to_intersection(Hash_map* mapa, int intersection_id, Street street){
+void add_street_to_intersection(Hash_map* mapa, long long intersection_id, Street street){
     // mirem si la intersecció està al hash map
     int index = find_intersection_index(mapa, intersection_id);
     
@@ -227,7 +229,7 @@ Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capac
 }
 
 // trobar les streets connectades a una intersecció (funció important)
-StreetNode* get_streets_at_intersection(Hash_map* mapa, int intersection_id){
+StreetNode* get_streets_at_intersection(Hash_map* mapa, long long intersection_id){
     // busquem si existeix la itersecció, i en cas de que si, a quin index està
     int index = find_intersection_index(mapa, intersection_id);
     // si no existeix retornem NULL
