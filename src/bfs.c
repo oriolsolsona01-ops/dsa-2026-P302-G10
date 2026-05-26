@@ -2,7 +2,6 @@
 #include "streets.h"
 #include "places.h"
 #include "houses.h"
-#include "bfs.h"
 #include <stdio.h>
 #include <stdlib.h>
 
