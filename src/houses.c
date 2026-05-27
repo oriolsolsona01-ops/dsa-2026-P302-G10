@@ -2,9 +2,6 @@
 #include "sample_lib.h"
 
 FILE* open_map_house(char* mapa){ 
-    // tasca 1 + nota 1 (la funció retorna el punter al document o NULL)
-    // xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1
-    char mapa[50];
     
     printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
     scanf("%s", mapa);
@@ -187,12 +184,12 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     scanf("%d", &choice);
 
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
-    HouseNode* current = head;
-    while (current != NULL){
-        if (current->street_name == street_name && current->house_number == choice) {
-            return current;
+    HouseNode* current_ = head;
+    while (current_ != NULL){
+        if (current_->street_name == street_name && current_->house_number == choice) {
+            return current_;
         }
-        current = current->next;
+        current_ = current_->next;
     }
 
     // En cas de no trobar cap coïncidència, diem que el número no es vàlid

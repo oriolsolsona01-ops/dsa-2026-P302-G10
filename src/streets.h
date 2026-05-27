@@ -3,6 +3,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#define MAX_PATH_LEN 200
+#define QUEUE_SIZE   2000
 
 typedef struct Position {
   double lat;
@@ -27,9 +29,20 @@ typedef struct Street{
 // estructura d'un node d'un carrer
 typedef struct StreetNode{
     struct Street carrer;
-    StreetNode* next;
+    struct StreetNode* next;
 } StreetNode;
 
+// ********** ESTRUCTURES PEL HASH MAP **********
+typedef struct hash_map_entry{
+    int intersection_id;             // key
+    StreetNode* list_of_streets;     // value
+} hash_map_entry;
+
+typedef struct Hash_map{
+    hash_map_entry* entries;          // array of entries
+    int count;                       // intersections counter
+    int capacity;                    // total array capacity
+} Hash_map;
 
 
 FILE* open_map_streets(char* mapa);
@@ -41,4 +54,23 @@ double haversine(Position posA, Position posB);
 Position midpoint(Position a, Position b);
 Street* find_closest_street(Position* posicio_user, StreetNode* head);
 StreetNode* find_connected_streets(Street* current_street, StreetNode* head);
-// falten funcions de streets
+// funcions del hash_map
+Hash_map* create_hashmap (int capacitat_inicial);
+Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capacity);
+StreetNode* get_streets_at_intersection(Hash_map* map, int intersection_id);
+void free_hashmap(Hash_map* map);
+
+// bfs
+// Un camí és un array de Streets + la seva longitud
+typedef struct {
+    Street streets[MAX_PATH_LEN];
+    int length;
+} Path;
+
+// La cua guarda Paths
+typedef struct {
+    Path  items[QUEUE_SIZE];
+    int   head, tail, size;
+} Queue;
+
+Path* BFS(Hash_map* hash_map, Street* from_street, Street* to_street);
