@@ -82,7 +82,7 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
             printf("Place not found.\n");
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
-        
+
         posicio_place->lat = trobat->lat;
         posicio_place->lon = trobat->lon;
 
@@ -201,7 +201,7 @@ Street* input_closest_street(Position* posicio_origen, StreetNode* list_of_stree
     Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
     // i mostem el text per pantalla
     printf("Closest street: %s\n", closest_street->street_name);
-    printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
+    printf("Between %lld (%lf, %lf) and %lld (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
 
     // i retornem el carrer més proxim
     return closest_street;
@@ -234,7 +234,6 @@ int main() {
     printf("*****************\nWelcome to DSA!\n*****************\n");
     char* mapa = choose_map();
     Position* posicio_origen = input_originposition(mapa);
-    
     // busquem la el carrer més proper
     FILE* street_file = open_map_streets(mapa);
     if (street_file == NULL) return 0;
@@ -247,24 +246,18 @@ int main() {
     
     // creem el hash map amb la llista de carrers
     Hash_map* map = fill_hashmap_from_streets(list_of_streets, 1024);
+   
     // i mostrem el connexos
     show_connected_streets(map, closest_street);
-    free_hashmap(map);
 
     Position* posicio_desti = input_destinationposition(mapa);
+
     Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
+  
 
-    Path* cami = BFS(map, closest_street, closest_street_desti);
+    StreetNode* cami = BFS(map, closest_street, closest_street_desti);
 
-    if (cami == NULL) {
-        printf("No s'ha trobat cap camí.\n");
-    } else {
-        printf("\nPath found (%d segments):\n", cami->length);
-        for (int i = 0; i < cami->length; i++) {
-            printf("  %d. %s\n", i + 1, cami->streets[i].street_name);
-        }
-        free(cami);
-    }
+    free_hashmap(map);
     return 0;
 
 //recordar fer free de tot

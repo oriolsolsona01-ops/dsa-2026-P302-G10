@@ -14,11 +14,11 @@ typedef struct Position {
 // estructura d'un carrer
 typedef struct Street{
     // dades de la posició inicial del carrer
-    int from_id;                // from_intersaction_id, 
+    long long from_id;                // from_intersaction_id, 
     Position from_position;
     
     // dades de la posició final del carrer
-    int to_id;                  // to_intersection_id, 
+    long long to_id;                  // to_intersection_id, 
     Position to_position;       
 
     // dades generals del carrer
@@ -34,7 +34,7 @@ typedef struct StreetNode{
 
 // ********** ESTRUCTURES PEL HASH MAP **********
 typedef struct hash_map_entry{
-    int intersection_id;             // key
+    long long intersection_id;             // key
     StreetNode* list_of_streets;     // value
 } hash_map_entry;
 
@@ -46,7 +46,7 @@ typedef struct Hash_map{
 
 
 FILE* open_map_streets(char* mapa);
-StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, int to, double to_lat, double to_lon, double len, char* name);
+StreetNode* add_street(StreetNode* head, long long from, double from_lat, double from_lon, long long to, double to_lat, double to_lon, double len, char* name);
 StreetNode* fill_linked_streets(FILE *fitxer);
 double toRadians(double degree);
 double toDegrees(double radians);
@@ -57,20 +57,9 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head);
 // funcions del hash_map
 Hash_map* create_hashmap (int capacitat_inicial);
 Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capacity);
-StreetNode* get_streets_at_intersection(Hash_map* map, int intersection_id);
+StreetNode* get_streets_at_intersection(Hash_map* map, long long intersection_id);
 void free_hashmap(Hash_map* map);
 
 // bfs
-// Un camí és un array de Streets + la seva longitud
-typedef struct {
-    Street streets[MAX_PATH_LEN];
-    int length;
-} Path;
-
-// La cua guarda Paths
-typedef struct {
-    Path  items[QUEUE_SIZE];
-    int   head, tail, size;
-} Queue;
-
-Path* BFS(Hash_map* hash_map, Street* from_street, Street* to_street);
+int same_street(Street* a, Street* b);
+StreetNode* BFS(Hash_map* hash_map, Street* from_street, Street* to_street);
