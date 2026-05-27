@@ -14,7 +14,7 @@ int same_street(Street* a, Street* b) {
 }
 
 // Retorna la llista enllaçada del camí (inici fins a fi)
-StreetNode* BFS(Hash_map* intersections_graph, Street fromStreet, Street toStreet) {
+StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStreet) {
     
     int max_size = 300000; 
     Street* cua_carrers = (Street*)malloc(max_size * sizeof(Street));
@@ -24,7 +24,7 @@ StreetNode* BFS(Hash_map* intersections_graph, Street fromStreet, Street toStree
     int tail = 0;
 
     // encoem inicialment
-    cua_carrers[tail] = fromStreet;
+    cua_carrers[tail] = *fromStreet;
     cua_pares[tail] = -1; // -1 vol dir que som a l'origen, no tenim pare
     tail++;
 
@@ -36,7 +36,7 @@ StreetNode* BFS(Hash_map* intersections_graph, Street fromStreet, Street toStree
         head++;
 
         // Hem arribat al final?
-        if (same_street(&current_street, &toStreet)) {
+        if (same_street(&current_street, toStreet)) {
             found_index = current_index;
             break;
         }

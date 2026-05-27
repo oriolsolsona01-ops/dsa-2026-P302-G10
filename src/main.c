@@ -256,8 +256,42 @@ int main() {
   
 
     StreetNode* cami = BFS(map, closest_street, closest_street_desti);
+    
+    // si no hi ha cami entre l'origen i el desti, s'acaba el codi
+    if (cami == NULL) {
+        printf("No path found!\n");
+        return 0;
+    }
+
+    // sinó, 
+    printf("\n--- ROUTE ---\n");
+    printf("Start at %s\n", cami->carrer.street_name);
+
+    // Recorrem els carrers (saltant el primer que ja l'hem mostrat)
+    StreetNode* current = cami->next;
+    printf("hola");
+    while (current != NULL) {
+        char* direction = calculate_turn(current->carrer.from_position, 
+                                         current->carrer.to_position, 
+                                         current->next->carrer.to_position);
+            
+        if (strcpy(direction, "straight") == 0){
+            printf("Continue %s on %s and continue for %.0fm\n",
+                    direction, 
+                    current->carrer.street_name, 
+                    current->carrer.lenght);
+        } else{
+            printf("Turn %s to %s and continue for %.0fm\n",
+                    direction, 
+                    current->carrer.street_name, 
+                    current->carrer.lenght);
+        }
+        current = current->next;
+    }
+    printf("You have arrived to %s\n", cami->carrer.street_name);
 
     free_hashmap(map);
+
     return 0;
 
 //recordar fer free de tot

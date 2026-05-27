@@ -271,3 +271,19 @@ void latlon_to_xy(double lat_ref, double lon_ref,
     *x = EARTH_RADIUS * dlon * cos(lat_ref_rad);
     *y = EARTH_RADIUS * dlat;
 }
+
+char* calculate_turn(Position A, Position B, Position C) {
+    double ax, ay, bx, by, cx, cy;
+
+    // passem les coordenades a valors 2D x i y
+    latlon_to_xy(A.lat, A.lon, A.lat, A.lon, &ax, &ay);
+    latlon_to_xy(A.lat, A.lon, B.lat, B.lon, &bx, &by);
+    latlon_to_xy(A.lat, A.lon, C.lat, C.lon, &cx, &cy);
+
+    // apliquem producte vectorial (Cross Product)
+    double cross_product = (bx - ax) * (cy - by) - (by - ay) * (cx - bx);
+
+    if (cross_product > 0.0) return "left";          // gir a l'esquerra
+    else if (cross_product < 0.0)  return "right";   // gir a la dreta
+    else return "straight";                          // seguir recte
+}
