@@ -255,17 +255,8 @@ int main() {
     Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
   
 
-    Path* cami = BFS(map, closest_street, closest_street_desti);
+    StreetNode* cami = BFS(map, closest_street, closest_street_desti);
 
-    if (cami == NULL) {
-        printf("No s'ha trobat cap camí.\n");
-    } else {
-        printf("\nPath found (%d segments):\n", cami->length);
-        for (int i = 0; i < cami->length; i++) {
-            printf("  %d. %s\n", i + 1, cami->streets[i].street_name);
-        }
-        free(cami);
-    }
     free_hashmap(map);
     return 0;
 

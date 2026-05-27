@@ -219,9 +219,9 @@ Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capac
     StreetNode* current = streets_head;
     while (current != NULL){
         // mentre current current no sigui null, cridem la helper function 2 per afegir el carrer a la intersecció
-        //(hem d'afegirlo tant a la intersecció inicial com a la final)
+        //solament cal afegir el carrer des d'on surt i al que va
         add_street_to_intersection(mapa, current->carrer.from_id, current->carrer);
-        add_street_to_intersection(mapa, current->carrer.to_id, current->carrer);
+        
         // un cop afegit, passem al següent
         current = current->next;
     }
