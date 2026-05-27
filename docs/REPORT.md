@@ -44,14 +44,14 @@ Sigui **V** el nombre de nodes (interseccions) i **E** el nombre d'arestes (segm
 
 | Mapa  | Interseccions | Latència seqüencial (ms) | Latència hashmap (ms) |
 |-------|:-------------:|:------------------------:|:---------------------:|
-| xs\_2 | 71            | OMPLIR                   | OMPLIR                |
-| md\_1 | 1.122         | OMPLIR                   | OMPLIR                |
-| lg\_1 | 3.283         | OMPLIR                   | OMPLIR                |
-| xl\_1 | 15.378        | OMPLIR                   | OMPLIR                |
+| xs\_2 | 71            | 0.0001                   | 0.0003                |
+| md\_1 | 1.122         | 0.0002                   | 0.0003                |
+| lg\_1 | 3.283         | 0.0006                   | 0.0003                |
+| xl\_1 | 15.378        | 0.003                    | 0.0003                |
 
 #### Gràfica
 
-![Latència per trobar carrers connectats vs mida del mapa](plots/plot1.png)
+![Gràfica Comparativa de Latències](plot1.png) 
 
 #### Explicació
 

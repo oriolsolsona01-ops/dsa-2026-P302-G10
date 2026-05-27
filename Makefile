@@ -1,11 +1,21 @@
-SRC_FILES := $(filter-out src/main.c, $(wildcard src/*.c))
+SRC_FILES := $(filter-out src/main.c src/main_mesures.c, $(wildcard src/*.c))
 
+# Compilació normal del projecte original
 compile:
 	gcc -Wall -Wextra -Werror src/main.c $(SRC_FILES) -o main.out -lm
 	
 r:
 	make compile
 	./main.out
+
+# --- NOVA ORDRE PER ALS TEUS EXPERIMENTS (Mesures) ---
+compile_mesures:
+	gcc -Wall -Wextra -Werror src/main_mesures.c $(SRC_FILES) -o main.out -lm
+
+m:
+	make compile_mesures
+	./main.out
+# -----------------------------------------------------
 
 v: 
 	make compile

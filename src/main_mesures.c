@@ -195,7 +195,7 @@ void show_connected_streets(Hash_map* hash_map, Street* closest_street, StreetNo
 
     // --- MESURA HASHMAP (Lab 5) ---
     clock_t start_hash = clock();
-    StreetNode* connected = get_streets_at_intersection(hash_map, closest_street->to_id);
+    get_streets_at_intersection(hash_map, closest_street->to_id);
     clock_t end_hash = clock();
     double ms_hash = ((double)(end_hash - start_hash) / CLOCKS_PER_SEC) * 1000.0;
     printf("[MESURA] Hashmap: %.4f ms\n", ms_hash);
@@ -250,42 +250,59 @@ char* choose_map(){
 }
 
 int main() {
+    printf("**************************************************\n");
+    printf("   EXECUTANT MESURES AUTOMÀTIQUES PER AL REPORT    \n");
+    printf("**************************************************\n");
 
-    printf("*****************\nWelcome to DSA!\n*****************\n");
-    char* mapa = choose_map();
-    Position* posicio_origen = input_originposition(mapa);
+    // Llista amb els mapes afegint la ruta i extensió reals del vostre projecte
+    char* mapes[] = {"data/xs_2.txt", "data/md_1.txt", "data/lg_1.txt", "data/xl_1.txt"};
+    char* noms_taula[] = {"xs_2", "md_1", "lg_1", "xl_1"};
     
-    // busquem la el carrer més proper
-    FILE* street_file = open_map_streets(mapa);
-    if (street_file == NULL) return 0;
-    StreetNode* list_of_streets = fill_linked_streets(street_file);
-    Street* closest_street = input_closest_street(posicio_origen,list_of_streets);
-    fclose(street_file);
-    
-    // fem la linked list de carrers
-    
-    
-    // creem el hash map amb la llista de carrers
-    Hash_map* map = fill_hashmap_from_streets(list_of_streets, 1024);
-    // i mostrem el connexos
-    show_connected_streets(map, closest_street, list_of_streets);
-    free_hashmap(map);
+    for(int i = 0; i < 4; i++) {
+        char* ruta_mapa = mapes[i];
+        char* nom_mapa = noms_taula[i];
 
-    Position* posicio_desti = input_destinationposition(mapa);
-    Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
-
-    Path* cami = BFS(map, closest_street, closest_street_desti);
-
-    if (cami == NULL) {
-        printf("No s'ha trobat cap camí.\n");
-    } else {
-        printf("\nPath found (%d segments):\n", cami->length);
-        for (int i = 0; i < cami->length; i++) {
-            printf("  %d. %s\n", i + 1, cami->streets[i].street_name);
+        FILE* street_file = fopen(ruta_mapa, "r");
+        if (street_file == NULL) {
+            printf("[MAPA %s] No s'ha trobat el fitxer a %s\n", nom_mapa, ruta_mapa);
+            continue;
         }
-        free(cami);
-    }
-    return 0;
+        StreetNode* list_of_streets = fill_linked_streets(street_file);
+        fclose(street_file);
+        
+        if (list_of_streets == NULL) {
+            printf("[MAPA %s] fill_linked_streets ha retornat NULL.\n", nom_mapa);
+            continue;
+        }
 
-//recordar fer free de tot
+        // Creem el Hashmap amb els carrers d'aquest mapa
+        Hash_map* map = fill_hashmap_from_streets(list_of_streets, 8192);
+        Street* test_street = &(list_of_streets->carrer);
+
+        // 1. MESURA DEL HASHMAP
+        double temps_hash = 0.0;
+        if (map != NULL) {
+            clock_t start_hash = clock();
+            get_streets_at_intersection(map, test_street->to_id);
+            clock_t end_hash = clock();
+            temps_hash = ((double)(end_hash - start_hash)/CLOCKS_PER_SEC)*1000.0;
+        }
+
+        // 2. MESURA DEL SEQÜENCIAL
+        clock_t start_seq = clock();
+        StreetNode* current = list_of_streets;
+        while (current != NULL) {
+            if (current->carrer.from_id == test_street->to_id) { }
+            current = current->next;
+        }
+        clock_t end_seq = clock();
+        double temps_seq = ((double)(end_seq - start_seq)/CLOCKS_PER_SEC)*1000.0;
+        
+        printf("[RESULTAT REAL] Mapa: %s | Seqüencial: %.4f ms | Hashmap: %.4f ms\n", nom_mapa, temps_seq, temps_hash);
+        
+        if (map != NULL) free_hashmap(map);
+    }
+
+    printf("\n--- PROVES COMPLETADES ---\n");
+    return 0;
 }
