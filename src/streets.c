@@ -52,7 +52,11 @@ StreetNode* fill_linked_streets(FILE *fitxer) {
    
 while (fscanf(fitxer, "%lld,%lf,%lf,%lld,%lf,%lf,%lf,%[^\n]",
         &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len, name) == 8) {
-
+        //elimina el \r si existeix
+        int name_len = strlen(name);
+        if (name_len > 0 && name[name_len - 1] == '\r') {
+            name[name_len - 1] = '\0';
+        }
         // Cridem a add_street passant-li el "cap" actual (streets)
         streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 
     }
@@ -136,10 +140,7 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
     StreetNode* connected = NULL;
 
     while (current != NULL) {
-        if ((current->carrer.from_id == current_street->from_id ||
-             current->carrer.from_id == current_street->to_id)  ||
-            (current->carrer.to_id   == current_street->from_id ||
-             current->carrer.to_id   == current_street->to_id)) {
+        if (current->carrer.from_id == current_street->to_id) {
 
             connected = add_street(connected,
                                    current->carrer.from_id,
