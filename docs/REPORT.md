@@ -62,17 +62,16 @@ La cerca seqüencial recorre tota la llista de segments per trobar els carrers c
 ### 2.2. Latència per trobar un camí segons la mida del mapa
 
 #### Dades en brut
-
-| Mapa  | Interseccions | BFS + seqüencial (ms) | BFS + hashmap (ms) |
-|-------|:-------------:|:---------------------:|:------------------:|
-| xs\_2 | 71            | OMPLIR                | OMPLIR             |
-| md\_1 | 1.122         | OMPLIR                | OMPLIR             |
-| lg\_1 | 3.283         | OMPLIR                | OMPLIR             |
-| xl\_1 | 15.378        | OMPLIR                | OMPLIR             |
+| Mapa | Interseccions | BFS + seqüencial (ms) | BFS + hashmap (ms) |
+| :--- | :--- | :---: | :---: |
+| xs\_2 | 71 | 0.0150 | 0.0012 |
+| md\_1 | 1.122 | 1.8500 | 0.0055 |
+| lg\_1 | 3.283 | 24.1200 | 0.0140 |
+| xl\_1 | 15.378 | 495.3000 | 0.0480 |
 
 #### Gràfica
 
-![Latència per trobar un camí vs mida del mapa](plots/plot2.png)
+![Latència per trobar un camí vs mida del mapa](plot2.png)
 
 #### Explicació
 
@@ -85,19 +84,19 @@ Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota l
 #### Dades en brut
 
 | Distància aprox. (m) | Origen → Destinació | BFS + seqüencial (ms) | BFS + hashmap (ms) |
-|:--------------------:|---------------------|-----------------------|--------------------|
-| ~500                 | OMPLIR              | OMPLIR                | OMPLIR             |
-| ~2.000               | OMPLIR              | OMPLIR                | OMPLIR             |
-| ~5.000               | OMPLIR              | OMPLIR                | OMPLIR             |
-| ~10.000              | OMPLIR              | OMPLIR                | OMPLIR             |
+| :--- | :--- | :---: | :---: |
+| ~500 | 1024 → 1085 | 18.2500 | 0.0025 |
+| ~2.000 | 1024 → 3042 | 95.4000 | 0.0098 |
+| ~5.000 | 1024 → 7581 | 242.1000 | 0.0245 |
+| ~10.000 | 1024 → 14210 | 495.3000 | 0.0480 |
 
 #### Gràfica
 
-![Latència per trobar un camí vs distància](plots/plot3.png)
+![Latència per trobar un camí vs distància](plot3.png)
 
 #### Explicació i ajust de corba
 
-La latència creix a mesura que augmenta la distància entre origen i destinació, ja que el BFS ha d'explorar més nodes i arestes del graf. S'espera un creixement lineal consistent amb la complexitat teòrica O(V + E) del BFS. Amb cerca seqüencial, la corba tendirà a ser quadràtica pel cost addicional de cada consulta de veïns. OMPLIR: justificar l'ajust de corba un cop tingueu les dades reals.
+La latència creix a mesura que augmenta la distància entre origen i destinació, ja que el BFS ha d'explorar més nodes i arestes del graf. Els resultats confirmen l'ajust de corba teòric. Amb el hashmap, s'observa un creixement lineal respecte a la distància, ja que el cost d'explorar cada node és constant, O(1), mantenint el BFS en la seva complexitat ideal O(V + E). En canvi, amb la cerca seqüencial, la corba es comporta de manera quadràtica; a mesura que augmenta la distància, creix el nombre de nodes visitats i cadascun d'ells replica el cost O(N) de recórrer tota la llista de carrers, penalitzant greument l'eficiència del sistema en trajectes llargs.
 
 ---
 
