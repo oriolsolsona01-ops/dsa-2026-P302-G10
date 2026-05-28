@@ -214,16 +214,14 @@ void show_connected_streets(Hash_map* hash_map, Street* closest_street, StreetNo
         printf("         - %s\n", connected_2->carrer.street_name);
         connected_2 = connected_2->next;
     }
-}
+} 
 
 Street* input_closest_street(Position* posicio_origen, StreetNode* list_of_streets){
     // trobem el carrer més proper
     Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
     // i mostem el text per pantalla
     printf("Closest street: %s\n", closest_street->street_name);
-    printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
-
-    // i retornem el carrer més proxim
+    printf("Between %lld (%lf, %lf) and %lld (%lf, %lf)\n", closest_street->from_id, closest_street->from_position.lat, closest_street->from_position.lon, closest_street->to_id, closest_street->to_position.lat, closest_street->to_position.lon);
     return closest_street;
 
 }
@@ -255,7 +253,7 @@ int main() {
     printf("**************************************************\n");
 
     // Llista amb els mapes afegint la ruta i extensió reals del vostre projecte
-    char* mapes[] = {"data/xs_2.txt", "data/md_1.txt", "data/lg_1.txt", "data/xl_1.txt"};
+    char* mapes[] = {"maps/xs_2/streets.txt", "maps/md_1/streets.txt", "maps/lg_1/streets.txt", "maps/xl_1/streets.txt"};
     char* noms_taula[] = {"xs_2", "md_1", "lg_1", "xl_1"};
     
     for(int i = 0; i < 4; i++) {

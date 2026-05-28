@@ -40,18 +40,18 @@ Sigui **V** el nombre de nodes (interseccions) i **E** el nombre d'arestes (segm
 
 ### 2.1. Latència per trobar carrers connectats segons la mida del mapa
 
-#### Dades en brut
+#### Dades en brut (Make m 5 cops)
 
 | Mapa  | Interseccions | Latència seqüencial (ms) | Latència hashmap (ms) |
 |-------|:-------------:|:------------------------:|:---------------------:|
-| xs\_2 | 71            | 0.0001                   | 0.0003                |
-| md\_1 | 1.122         | 0.0002                   | 0.0003                |
-| lg\_1 | 3.283         | 0.0006                   | 0.0003                |
-| xl\_1 | 15.378        | 0.003                    | 0.0003                |
+| xs\_2 | 71            | 0.0016                   | 0.0026               |
+| md\_1 | 1.122         | 0.0098                   | 0.0034               |
+| lg\_1 | 3.283         | 0.0890                  | 0.0046                |
+| xl\_1 | 15.378        | 0.4780                    | 0.0036               |
 
 #### Gràfica
 
-![Gràfica Comparativa de Latències](plot1.png) 
+![Gràfica Comparativa de Latències](Plot1.png) 
 
 #### Explicació
 
