@@ -3,9 +3,6 @@
 
 FILE* open_map_house(char* mapa){ 
     
-    printf("Introdueix un nom de mapa (xs_1, xs_2, md_1, lg_1, xl_1 or 2xl_1): ");
-    scanf("%s", mapa);
-
     //creem un string amb la ruta sencera del filename
     char rutafinal [150];
     sprintf(rutafinal, "maps/%s/houses.txt", mapa); //escriu tot el contingut a rutafinal
@@ -116,7 +113,7 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
         expand_abbreviations(lower_current,expanded_current);
 
         // Calculem la distància d'ortografia
-        int dist = LevenshteinDistance(current->street_name, target_street);
+        int dist = LevenshteinDistance(expanded_current, expanded_street);
 
         // Si és una coincidència PERFECTA (distància 0) i el número quadra
         if (dist == 0) {

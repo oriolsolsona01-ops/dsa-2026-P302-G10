@@ -6,95 +6,82 @@
 #include <stdlib.h>
 
 
-void queue_init(Queue* q) {
-    q->head = 0;
-    q->tail  = 0;
-    q->size  = 0;
-}
 
-int queue_is_empty(Queue* q) {
-    return q->size == 0;
-}
-
-void enqueue(Queue* q, Path p) {
-    if (q->size >= QUEUE_SIZE) return;   // cua plena, no fem res
-    q->items[q->tail] = p;
-    q->tail  = (q->tail + 1) % QUEUE_SIZE;
-    q->size++;
-}
-
-Path dequeue(Queue* q) {
-    Path p   = q->items[q->head];
-    q->head = (q->head + 1) % QUEUE_SIZE;
-    q->size--;
-    return p;
-}
 
 // compara si dos carrers són el mateix segment
-
 int same_street(Street* a, Street* b) {
     return (a->from_id == b->from_id && a->to_id == b->to_id);
 }
 
-// comprova si un carrer ja és al array de visitats 
+// Retorna la llista enllaçada del camí (inici fins a fi)
+StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStreet) {
+    
+    int max_size = 300000; 
+    Street* cua_carrers = (Street*)malloc(max_size * sizeof(Street));
+    int* cua_pares = (int*)malloc(max_size * sizeof(int));
+    
+    int head = 0;
+    int tail = 0;
 
-int is_visited(Street* visited, int count, Street* s) {
-    for (int i = 0; i < count; i++) {
-        if (same_street(&visited[i], s)) return 1;
-    }
-    return 0;
-}
+    // encoem inicialment
+    cua_carrers[tail] = *fromStreet;
+    cua_pares[tail] = -1; // -1 vol dir que som a l'origen, no tenim pare
+    tail++;
 
-Path* BFS(Hash_map* hash_map, Street* from_street, Street* to_street) {
+    int found_index = -1; // guardarà la posició on hem trobat el destí
 
-    Queue Q;
-    queue_init(&Q);
+    while (head < tail) {
+        int current_index = head;
+        Street current_street = cua_carrers[head];
+        head++;
 
-    // visited: array de carrers ja explorats
-    Street visited[MAX_PATH_LEN * 4];
-    int visited_count = 0;
-
-    // camí inicial: només conté el carrer d'origen
-    Path initial_path;
-    initial_path.streets[0] = *from_street;
-    initial_path.length = 1;
-    enqueue(&Q, initial_path);
-
-    while (!queue_is_empty(&Q)) {
-
-        Path path = dequeue(&Q);
-        Street current_street = path.streets[path.length - 1];  // path[-1]
-
-        // si arribem al ultim carrer
-        if (same_street(&current_street, to_street)) {
-            Path* result = (Path*)malloc(sizeof(Path));
-            *result = path;
-            return result;
+        // Hem arribat al final?
+        if (same_street(&current_street, toStreet)) {
+            found_index = current_index;
+            break;
         }
 
-        if (!is_visited(visited, visited_count, &current_street)) {
+        // busquem cap a on podem anar
+        StreetNode* connected = get_streets_at_intersection(intersections_graph, current_street.to_id);
+        
+        while (connected != NULL) {
+            Street* neighbor = &connected->carrer;
 
-            // marquem com a visitat
-            visited[visited_count] = current_street;
-            visited_count++;
-
-            // mirem tots els carrers connectats a la intersecció final
-            // (intersections_graph[current_street.to_intersection_id])
-            StreetNode* connected = get_streets_at_intersection(hash_map, current_street.to_id);
-            while (connected != NULL) {
-                Street* neighbor = &connected->carrer;
-
-                if (!is_visited(visited, visited_count, neighbor)) {
-                    // new_path = path + [connected_street]
-                    Path new_path = path;
-                    new_path.streets[new_path.length] = *neighbor;
-                    new_path.length++;
-                    enqueue(&Q, new_path);
+            // buscar si el aquest vei ja ha estat visitat (aixo es cerca lineal, podem utilitzar hash_map per guardar els visited)
+            int visitat = 0;
+            for (int i = 0; i < tail; i++) {
+                if (same_street(&cua_carrers[i], neighbor)) {
+                    visitat = 1;
+                    break;
                 }
-                connected = connected->next;
             }
+
+            if (!visitat && tail < max_size) {
+                cua_carrers[tail] = *neighbor;
+                cua_pares[tail] = current_index; // el parent pointer
+                tail++;
+            }
+            connected = connected->next;
         }
     }
 
-    return NULL;  // no s'ha trobat cap camí
+    StreetNode* path_head = NULL;
+
+    // reconstruïm el camí saltant de pare a pare fins arribar a l'origen
+    if (found_index != -1) {
+        int curr = found_index;
+        while (curr != -1) {
+            Street c = cua_carrers[curr];
+            // afegim al cap de la llista, així al final quedarà ordenat
+            path_head = add_street(path_head, c.from_id, c.from_position.lat, c.from_position.lon,
+                                   c.to_id, c.to_position.lat, c.to_position.lon, c.lenght, c.street_name);
+            
+            curr = cua_pares[curr]; // retrocedim 1 salt
+        }
+    }
+
+    free(cua_carrers);
+    free(cua_pares);
+    
+    return path_head;
 }

@@ -18,8 +18,8 @@ FILE* open_map_streets(char* mapa){
     return fitxer; 
 }
 
-StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_lon, 
-                       int to, double to_lat, double to_lon, double len, char* name) {
+StreetNode* add_street(StreetNode* head, long long from, double from_lat, double from_lon, 
+                       long long to, double to_lat, double to_lon, double len, char* name) {
 
     StreetNode* newStreet = (StreetNode*)malloc(sizeof(StreetNode));
     if (newStreet == NULL) return head; // Seguretat si falla el malloc
@@ -44,20 +44,26 @@ StreetNode* add_street(StreetNode* head, int from, double from_lat, double from_
 }
 
 StreetNode* fill_linked_streets(FILE *fitxer) { 
-    int from, to;
+    long long from, to;
     double from_lat, from_lon, to_lat, to_lon, len;
     char name[100];
     StreetNode* streets = NULL;
 
-    while (fscanf(fitxer,"%[^,], %d,%lf,%lf,%d,%lf,%lf,%lf", 
-        name, &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len) == 8) {
-
+   
+while (fscanf(fitxer, "%lld,%lf,%lf,%lld,%lf,%lf,%lf,%[^\n]",
+        &from, &from_lat, &from_lon, &to, &to_lat, &to_lon, &len, name) == 8) {
+        //elimina el \r si existeix
+        int name_len = strlen(name);
+        if (name_len > 0 && name[name_len - 1] == '\r') {
+            name[name_len - 1] = '\0';
+        }
         // Cridem a add_street passant-li el "cap" actual (streets)
         streets = add_street(streets, from, from_lat, from_lon, to, to_lat, to_lon, len, name); 
     }
 
     return streets; 
 }
+
 
 // ********** OPERACIONS MATEMÀTIQUES **********
 double toRadians(double degree) {
@@ -113,7 +119,7 @@ Position midpoint(Position a, Position b) {
 
 Street* find_closest_street(Position* posicio_user, StreetNode* head){
     StreetNode* current = head;
-    Street* closest = NULL;
+    Street* closest = (Street*)malloc(sizeof(Street));
     double min = 999999;
     while(current != NULL){
         Position mid = midpoint(current->carrer.from_position , current->carrer.to_position);
@@ -134,10 +140,7 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
     StreetNode* connected = NULL;
 
     while (current != NULL) {
-        if ((current->carrer.from_id == current_street->from_id ||
-             current->carrer.from_id == current_street->to_id)  ||
-            (current->carrer.to_id   == current_street->from_id ||
-             current->carrer.to_id   == current_street->to_id)) {
+        if (current->carrer.from_id == current_street->to_id) {
 
             connected = add_street(connected,
                                    current->carrer.from_id,
@@ -157,7 +160,7 @@ StreetNode* find_connected_streets(Street* current_street, StreetNode* head) {
 //********** CERCA PER HASH MAP DE CLOSEST STREET **********
 //________HELPER FUNCTION 1________
 // busquem si una intersecció ja existeix dins el hashmap.
-int find_intersection_index(Hash_map* mapa, int intersection_id){
+int find_intersection_index(Hash_map* mapa, long long intersection_id){
     // recorrem la llista buscant si hi ha una intersection_id igual a la que ens dona l'usuari, en cas de ser aixi, retornem l'index d'aquest 
     for (int i = 0; i < mapa->count; i++){
         if (mapa->entries[i].intersection_id == intersection_id) return i;
@@ -168,7 +171,7 @@ int find_intersection_index(Hash_map* mapa, int intersection_id){
 
 //________HELPER FUNCTION 2________
 // afegim un carrer a una intersecció (o creem la intersecció si no existeix).
-void add_street_to_intersection(Hash_map* mapa, int intersection_id, Street street){
+void add_street_to_intersection(Hash_map* mapa, long long intersection_id, Street street){
     // mirem si la intersecció està al hash map
     int index = find_intersection_index(mapa, intersection_id);
     
@@ -217,9 +220,9 @@ Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capac
     StreetNode* current = streets_head;
     while (current != NULL){
         // mentre current current no sigui null, cridem la helper function 2 per afegir el carrer a la intersecció
-        //(hem d'afegirlo tant a la intersecció inicial com a la final)
+        //solament cal afegir el carrer des d'on surt i al que va
         add_street_to_intersection(mapa, current->carrer.from_id, current->carrer);
-        add_street_to_intersection(mapa, current->carrer.to_id, current->carrer);
+        
         // un cop afegit, passem al següent
         current = current->next;
     }
@@ -227,7 +230,7 @@ Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capac
 }
 
 // trobar les streets connectades a una intersecció (funció important)
-StreetNode* get_streets_at_intersection(Hash_map* mapa, int intersection_id){
+StreetNode* get_streets_at_intersection(Hash_map* mapa, long long intersection_id){
     // busquem si existeix la itersecció, i en cas de que si, a quin index està
     int index = find_intersection_index(mapa, intersection_id);
     // si no existeix retornem NULL
@@ -258,4 +261,30 @@ void free_hashmap(Hash_map* mapa){
     free(mapa->entries);
     // i alliberem l'estructura del hash map
     free(mapa);
+}
+
+void latlon_to_xy(double lat_ref, double lon_ref,
+                  double lat, double lon,
+                  double *x, double *y) {
+    double lat_ref_rad = toRadians(lat_ref);
+    double dlat = toRadians(lat - lat_ref);
+    double dlon = toRadians(lon - lon_ref);
+    *x = EARTH_RADIUS * dlon * cos(lat_ref_rad);
+    *y = EARTH_RADIUS * dlat;
+}
+
+char* calculate_turn(Position A, Position B, Position C) {
+    double ax, ay, bx, by, cx, cy;
+
+    // passem les coordenades a valors 2D x i y
+    latlon_to_xy(A.lat, A.lon, A.lat, A.lon, &ax, &ay);
+    latlon_to_xy(A.lat, A.lon, B.lat, B.lon, &bx, &by);
+    latlon_to_xy(A.lat, A.lon, C.lat, C.lon, &cx, &cy);
+
+    // apliquem producte vectorial (Cross Product)
+    double cross_product = (bx - ax) * (cy - by) - (by - ay) * (cx - bx);
+
+    if (cross_product > 0.0) return "left";          // gir a l'esquerra
+    else if (cross_product < 0.0)  return "right";   // gir a la dreta
+    else return "straight";                          // seguir recte
 }
