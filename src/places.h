@@ -21,3 +21,6 @@ FILE* open_map_places();
 PlaceNode* add_Place(PlaceNode* head, char* PlaceName, char* general_id, char* specific_id, double lat, double lon);
 PlaceNode* fill_linked_list_places (FILE *fitxer);
 PlaceNode* find_place(PlaceNode* head, char* target_place);
+
+//free
+void free_linked_places(PlaceNode* head);

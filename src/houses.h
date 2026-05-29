@@ -21,3 +21,5 @@ HouseNode* fill_linked_list_houses (FILE *fitxer);
 HouseNode* find_house_name(HouseNode* head, char* target_street);
 HouseNode* triar_num(HouseNode* head, char *street_name, int num);
 
+//free
+void free_linked_houses(HouseNode* head);

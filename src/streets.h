@@ -71,3 +71,6 @@ StreetNode* BFS(Hash_map* hash_map, Street* from_street, Street* to_street);
 // calcúl de gir
 void latlon_to_xy(double lat_ref, double lon_ref, double lat, double lon, double *x, double *y);
 char* calculate_turn(Position A, Position B, Position C);
+
+// free
+void free_linked_streets(StreetNode* head);
