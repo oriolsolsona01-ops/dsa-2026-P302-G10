@@ -54,6 +54,10 @@ double haversine(Position posA, Position posB);
 Position midpoint(Position a, Position b);
 Street* find_closest_street(Position* posicio_user, StreetNode* head);
 StreetNode* find_connected_streets(Street* current_street, StreetNode* head);
+
+int find_intersection_index(Hash_map* mapa, long long intersection_id);
+void add_street_to_intersection(Hash_map* mapa, long long intersection_id, Street street);
+
 // funcions del hash_map
 Hash_map* create_hashmap (int capacitat_inicial);
 Hash_map* fill_hashmap_from_streets (StreetNode* streets_head, int initial_capacity);

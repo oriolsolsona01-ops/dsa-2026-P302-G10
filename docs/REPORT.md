@@ -73,7 +73,7 @@ La cerca seqüencial recorre tota la llista de segments per trobar els carrers c
 
 ![Latència per trobar un camí vs mida del mapa](plot2.png)
 
-#### Explicació
+##### Explicació
 
 Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota la llista per trobar els veïns: cost total O(V · N). Amb el hashmap, cada consulta de veïns és O(1) amortitzada i el BFS es manté en O(V + E), de manera que la latència creix molt més lentament amb la mida del mapa.
 
@@ -94,7 +94,7 @@ Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota l
 
 ![Latència per trobar un camí vs distància](plot3.png)
 
-#### Explicació i ajust de corba
+##### Explicació i ajust de corba
 
 La latència creix a mesura que augmenta la distància entre origen i destinació, ja que el BFS ha d'explorar més nodes i arestes del graf. Els resultats confirmen l'ajust de corba teòric. Amb el hashmap, s'observa un creixement lineal respecte a la distància, ja que el cost d'explorar cada node és constant, O(1), mantenint el BFS en la seva complexitat ideal O(V + E). En canvi, amb la cerca seqüencial, la corba es comporta de manera quadràtica; a mesura que augmenta la distància, creix el nombre de nodes visitats i cadascun d'ells replica el cost O(N) de recórrer tota la llista de carrers, penalitzant greument l'eficiència del sistema en trajectes llargs.
 

@@ -20,12 +20,15 @@ StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStr
     Street* cua_carrers = (Street*)malloc(max_size * sizeof(Street));
     int* cua_pares = (int*)malloc(max_size * sizeof(int));
     
+    Hash_map* visited = create_hashmap(1024);
+
     int head = 0;
     int tail = 0;
 
     // encoem inicialment
     cua_carrers[tail] = *fromStreet;
     cua_pares[tail] = -1; // -1 vol dir que som a l'origen, no tenim pare
+    add_street_to_intersection(visited, fromStreet->from_id, *fromStreet);
     tail++;
 
     int found_index = -1; // guardarà la posició on hem trobat el destí
@@ -48,17 +51,17 @@ StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStr
             Street* neighbor = &connected->carrer;
 
             // buscar si el aquest vei ja ha estat visitat (aixo es cerca lineal, podem utilitzar hash_map per guardar els visited)
-            int visitat = 0;
-            for (int i = 0; i < tail; i++) {
-                if (same_street(&cua_carrers[i], neighbor)) {
-                    visitat = 1;
-                    break;
-                }
+            int ja_visitat = 0;
+            StreetNode* v = get_streets_at_intersection(visited, neighbor->from_id);
+            while (v != NULL) {
+                if (v->carrer.to_id == neighbor->to_id) { ja_visitat = 1; break; }
+                v = v->next;
             }
 
-            if (!visitat && tail < max_size) {
+            if (!ja_visitat && tail < max_size) {
                 cua_carrers[tail] = *neighbor;
-                cua_pares[tail] = current_index; // el parent pointer
+                cua_pares[tail] = current_index; // el parent pointerç
+                add_street_to_intersection(visited, neighbor->from_id, *neighbor);
                 tail++;
             }
             connected = connected->next;
@@ -79,7 +82,7 @@ StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStr
             curr = cua_pares[curr]; // retrocedim 1 salt
         }
     }
-
+    free_hashmap(visited);
     free(cua_carrers);
     free(cua_pares);
     
