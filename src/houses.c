@@ -139,10 +139,12 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
     }
     //demanem a l'usuari que esculli la street a la qual està
     int opcio;
-    printf ("You are in:\n");
-    printf ("1. %s.\n", top_3[0]->street_name);
-    printf ("2. %s.\n", top_3[1]->street_name);
-    printf ("3. %s.\n", top_3[2]->street_name);
+    if (top_3[0] == NULL) { printf("Street not found.\n"); return NULL; }
+    printf("You are in:\n");
+    printf("1. %s\n", top_3[0]->street_name);
+    if (top_3[1] != NULL) printf("2. %s\n", top_3[1]->street_name);
+    if (top_3[2] != NULL) printf("3. %s\n", top_3[2]->street_name);
+
     scanf("%d", &opcio);
 
     // comprovem que la opcio és vàlida
@@ -159,7 +161,7 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     HouseNode* current = head;
     while (current != NULL){
         // Mirem si coincideix i, en cas de que si, presentem per pantalla el número d'aquesta
-        if (current->street_name == street_name && current->house_number == num ){
+        if (strcmp(current->street_name,street_name) == 0 && current->house_number == num ){
             return current;
         }
         current = current->next;
@@ -170,7 +172,7 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
 
     current = head;
     while (current != NULL){
-        if (current->street_name == street_name)
+        if (strcmp(current->street_name,street_name) == 0)
             printf("***[%d]***\n", current->house_number);
         current = current-> next;
     }
@@ -183,7 +185,7 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
     HouseNode* current_ = head;
     while (current_ != NULL){
-        if (current_->street_name == street_name && current_->house_number == choice) {
+        if (strcmp(current->street_name,street_name) == 0 && current_->house_number == choice) {
             return current_;
         }
         current_ = current_->next;

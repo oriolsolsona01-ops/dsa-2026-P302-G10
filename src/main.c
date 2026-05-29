@@ -162,6 +162,7 @@ Position* input_destinationposition(char* mapa){
             printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
             printf("    Place not found.\n");
+            return NULL;
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
@@ -183,11 +184,11 @@ void show_connected_streets (Hash_map* hash_map, Street* closest_street){
     printf("        Which is connected to:\n");
     // ara busquem els carrers connectats al més proper i els mostrem
     // busquem els carrers conenctats a la intersecció inicial
-    StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
+    /*StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
     while (connected_1 != NULL){
         printf("            - %s.\n", connected_1->carrer.street_name);
         connected_1 = connected_1->next;
-    }
+    }*/
     // i els carrers connectats a la intersecció final
     StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
     while (connected_2 != NULL){
@@ -260,6 +261,7 @@ int main() {
     // si no hi ha cami entre l'origen i el desti, s'acaba el codi
     if (cami == NULL) {
         printf("    No path found!\n");
+        free_hashmap(map);
         return 0;
     }
 
@@ -269,6 +271,10 @@ int main() {
 
     // Recorrem els carrers (saltant el primer que ja l'hem mostrat)
     StreetNode* current = cami->next;
+    if (current == NULL){
+        printf("    You have arrived to your destination!\n");
+        return 0;
+    }
     double dist = current->carrer.lenght;
     while (current != NULL && current->next != NULL) {
         char* direction = calculate_turn(current->carrer.from_position, 
@@ -301,10 +307,11 @@ int main() {
     
 
     free_hashmap(map);
-
+    free(posicio_origen);   
+    free(posicio_desti);
+    free(closest_street);
+    free(closest_street_desti);
     return 0;
-
-//recordar fer free de tot
 }
 
 
