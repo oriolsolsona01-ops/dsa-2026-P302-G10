@@ -269,33 +269,42 @@ int main() {
 
     // Recorrem els carrers (saltant el primer que ja l'hem mostrat)
     StreetNode* current = cami->next;
-
+    double dist = current->carrer.lenght;
     while (current != NULL && current->next != NULL) {
         char* direction = calculate_turn(current->carrer.from_position, 
                                          current->carrer.to_position, 
                                          current->next->carrer.to_position);
-            
-        if (strcmp(direction, "straight") == 0){
-            printf("Continue %s on %s and continue for %.0fm\n",
-                    direction, 
-                    current->next->carrer.street_name, 
-                    current->carrer.lenght);
+        if (current->next != NULL && strcmp(current->carrer.street_name, current->next->carrer.street_name) == 0){
+            dist += current->next->carrer.lenght;
+            current = current->next;
+            continue;
         } else{
-            printf("Turn %s to %s and continue for %.0fm\n",
-                    direction, 
-                    current->next->carrer.street_name, 
-                    current->carrer.lenght);
-        }
+            if (strcmp(direction, "straight") == 0){
+                printf("Continue %s on %s and continue for %.0fm\n",
+                        direction, 
+                        current->next->carrer.street_name, 
+                        dist);
+            } else{
+                printf("Turn %s to %s and continue for %.0fm\n",
+                        direction, 
+                        current->next->carrer.street_name, 
+                        dist);
+            }
+        }      
+                                   
         current = current->next;
+        dist = current->carrer.lenght;
+    
     }
     if (current != NULL){
         printf("You have arrived to %s\n", current->carrer.street_name);
     }
     
-
     free_hashmap(map);
 
     return 0;
 
 //recordar fer free de tot
 }
+
+
