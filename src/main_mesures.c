@@ -1,3 +1,4 @@
+#include <time.h>
 #include "sample_lib.h"
 #include "streets.h"
 #include "places.h"
@@ -51,9 +52,9 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
 
         if (final_house != NULL) {
-            printf("\n    Found at (%f, %f)\n", final_house->lat, final_house->lon);
+            printf("Found at (%f, %f)\n", final_house->lat, final_house->lon);
         } else {
-            printf("    Address not found.\n");
+            printf("Address not found.\n");
         }
 
         Position* posicio_place = (Position*)malloc(sizeof(Position));
@@ -77,12 +78,12 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
         PlaceNode* trobat = find_place(list_of_places, place_name);
 
         if (trobat != NULL) {
-            printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
+            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
-            printf("    Place not found.\n");
+            printf("Place not found.\n");
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
-
+        
         posicio_place->lat = trobat->lat;
         posicio_place->lon = trobat->lon;
 
@@ -133,9 +134,9 @@ Position* input_destinationposition(char* mapa){
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
 
         if (final_house != NULL) {
-            printf("    Found at (%f, %f)\n", final_house->lat, final_house->lon);
+            printf("Found at (%f, %f)\n", final_house->lat, final_house->lon);
         } else {
-            printf("    Address not found.\n");
+            printf("Address not found.\n");
         }
 
         Position* posicio_place = (Position*)malloc(sizeof(Position));
@@ -159,10 +160,9 @@ Position* input_destinationposition(char* mapa){
         PlaceNode* trobat = find_place(list_of_places, place_name);
 
         if (trobat != NULL) {
-            printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
+            printf("Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
-            printf("    Place not found.\n");
-            return NULL;
+            printf("Place not found.\n");
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
@@ -178,20 +178,39 @@ Position* input_destinationposition(char* mapa){
     return NULL;
 }
 //**********HELPER FUNCTION**********
-void show_connected_streets (Hash_map* hash_map, Street* closest_street){
-    printf("\n    From this street segment, you can go to:\n");
+void show_connected_streets(Hash_map* hash_map, Street* closest_street, StreetNode* list_of_streets) {
+    
+    // --- MESURA SEQÜENCIAL (Lab 4) ---
+    clock_t start_seq = clock();
+    StreetNode* current = list_of_streets;
+    while (current != NULL) {
+        if (current->carrer.from_id == closest_street->to_id) {
+            // carrer connectat trobat
+        }
+        current = current->next;
+    }
+    clock_t end_seq = clock();
+    double ms_seq = ((double)(end_seq - start_seq) / CLOCKS_PER_SEC) * 1000.0;
+    printf("[MESURA] Seqüencial: %.4f ms\n", ms_seq);
+
+    // --- MESURA HASHMAP (Lab 5) ---
+    clock_t start_hash = clock();
+    get_streets_at_intersection(hash_map, closest_street->to_id);
+    clock_t end_hash = clock();
+    double ms_hash = ((double)(end_hash - start_hash) / CLOCKS_PER_SEC) * 1000.0;
+    printf("[MESURA] Hashmap: %.4f ms\n", ms_hash);
+
+    // --- SORTIDA NORMAL ---
+    printf("From this street segment, you can go to:\n");
     printf("    - %s\n", closest_street->street_name);
     printf("        Which is connected to:\n");
-    // ara busquem els carrers connectats al més proper i els mostrem
-    // busquem els carrers conenctats a la intersecció inicial
-    /*StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
-    while (connected_1 != NULL){
-        printf("            - %s.\n", connected_1->carrer.street_name);
+    StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
+    while (connected_1 != NULL) {
+        printf("         - %s\n", connected_1->carrer.street_name);
         connected_1 = connected_1->next;
-    }*/
-    // i els carrers connectats a la intersecció final
+    }
     StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
-    while (connected_2 != NULL){
+    while (connected_2 != NULL) {
         printf("         - %s\n", connected_2->carrer.street_name);
         connected_2 = connected_2->next;
     }
@@ -201,8 +220,8 @@ Street* input_closest_street(Position* posicio_origen, StreetNode* list_of_stree
     // trobem el carrer més proper
     Street* closest_street = find_closest_street(posicio_origen,list_of_streets);
     // i mostem el text per pantalla
-    printf("    Closest street: %s\n", closest_street->street_name);
-    printf("    Between %lld (%lf, %lf) and %lld (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
+    printf("Closest street: %s\n", closest_street->street_name);
+    printf("Between %d (%lf, %lf) and %d (%lf, %lf)\n",closest_street->from_id,closest_street->from_position.lat,closest_street->from_position.lon,closest_street->to_id,closest_street->to_position.lat,closest_street->to_position.lon);
 
     // i retornem el carrer més proxim
     return closest_street;
@@ -231,86 +250,59 @@ char* choose_map(){
 }
 
 int main() {
+    printf("**************************************************\n");
+    printf("   EXECUTANT MESURES AUTOMÀTIQUES PER AL REPORT    \n");
+    printf("**************************************************\n");
 
-    printf("*****************\nWelcome to DSA!\n*****************\n");
-    char* mapa = choose_map();
-    Position* posicio_origen = input_originposition(mapa);
-    // busquem la el carrer més proper
-    FILE* street_file = open_map_streets(mapa);
-    if (street_file == NULL) return 0;
-    StreetNode* list_of_streets = fill_linked_streets(street_file);
-    Street* closest_street = input_closest_street(posicio_origen,list_of_streets);
-    fclose(street_file);
+    // Llista amb els mapes afegint la ruta i extensió reals del vostre projecte
+    char* mapes[] = {"data/xs_2.txt", "data/md_1.txt", "data/lg_1.txt", "data/xl_1.txt"};
+    char* noms_taula[] = {"xs_2", "md_1", "lg_1", "xl_1"};
     
-    // fem la linked list de carrers
-    
-    
-    // creem el hash map amb la llista de carrers
-    Hash_map* map = fill_hashmap_from_streets(list_of_streets, 1024);
-   
-    // i mostrem el connexos
-    show_connected_streets(map, closest_street);
+    for(int i = 0; i < 4; i++) {
+        char* ruta_mapa = mapes[i];
+        char* nom_mapa = noms_taula[i];
 
-    Position* posicio_desti = input_destinationposition(mapa);
-
-    Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
-  
-
-    StreetNode* cami = BFS(map, closest_street, closest_street_desti);
-    
-    // si no hi ha cami entre l'origen i el desti, s'acaba el codi
-    if (cami == NULL) {
-        printf("    No path found!\n");
-        free_hashmap(map);
-        return 0;
-    }
-
-    // sinó, 
-    printf("\n--- ROUTE ---\n");
-    printf("    Start at %s\n", cami->carrer.street_name);
-
-    // Recorrem els carrers (saltant el primer que ja l'hem mostrat)
-    StreetNode* current = cami->next;
-    if (current == NULL){
-        printf("    You have arrived to your destination!\n");
-        return 0;
-    }
-    double dist = current->carrer.lenght;
-    while (current != NULL && current->next != NULL) {
-        char* direction = calculate_turn(current->carrer.from_position, 
-                                         current->carrer.to_position, 
-                                         current->next->carrer.to_position);
-            
-        if (current->next != NULL && strcmp(current->carrer.street_name, current->next->carrer.street_name) == 0){
-            dist += current->next->carrer.lenght;
-            current = current->next;
+        FILE* street_file = fopen(ruta_mapa, "r");
+        if (street_file == NULL) {
+            printf("[MAPA %s] No s'ha trobat el fitxer a %s\n", nom_mapa, ruta_mapa);
             continue;
-        } else{
-            if (strcmp(direction, "straight") == 0){
-                printf("    Continue %s on %s and continue for %.0fm\n",
-                        direction, 
-                        current->next->carrer.street_name, 
-                        dist);
-            } else{
-                printf("    Turn %s to %s and continue for %.0fm\n",
-                        direction, 
-                        current->next->carrer.street_name, 
-                        dist);
-            }
-        }        
-        current = current->next;
-        dist = current->carrer.lenght;
+        }
+        StreetNode* list_of_streets = fill_linked_streets(street_file);
+        fclose(street_file);
+        
+        if (list_of_streets == NULL) {
+            printf("[MAPA %s] fill_linked_streets ha retornat NULL.\n", nom_mapa);
+            continue;
+        }
+
+        // Creem el Hashmap amb els carrers d'aquest mapa
+        Hash_map* map = fill_hashmap_from_streets(list_of_streets, 8192);
+        Street* test_street = &(list_of_streets->carrer);
+
+        // 1. MESURA DEL HASHMAP
+        double temps_hash = 0.0;
+        if (map != NULL) {
+            clock_t start_hash = clock();
+            get_streets_at_intersection(map, test_street->to_id);
+            clock_t end_hash = clock();
+            temps_hash = ((double)(end_hash - start_hash)/CLOCKS_PER_SEC)*1000.0;
+        }
+
+        // 2. MESURA DEL SEQÜENCIAL
+        clock_t start_seq = clock();
+        StreetNode* current = list_of_streets;
+        while (current != NULL) {
+            if (current->carrer.from_id == test_street->to_id) { }
+            current = current->next;
+        }
+        clock_t end_seq = clock();
+        double temps_seq = ((double)(end_seq - start_seq)/CLOCKS_PER_SEC)*1000.0;
+        
+        printf("[RESULTAT REAL] Mapa: %s | Seqüencial: %.4f ms | Hashmap: %.4f ms\n", nom_mapa, temps_seq, temps_hash);
+        
+        if (map != NULL) free_hashmap(map);
     }
-    if (current != NULL){
-        printf("    You have arrived to %s\n", current->carrer.street_name);
-    }
-    
-    free_hashmap(map);
-    free(posicio_origen);   
-    free(posicio_desti);
-    free(closest_street);
-    free(closest_street_desti);
+
+    printf("\n--- PROVES COMPLETADES ---\n");
     return 0;
 }
-
-
