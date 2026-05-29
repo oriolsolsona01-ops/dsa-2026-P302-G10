@@ -49,7 +49,7 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
         }
 
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
-
+        
         if (final_house != NULL) {
             printf("\n    Found at (%f, %f)\n", final_house->lat, final_house->lon);
         } else {
@@ -183,16 +183,11 @@ void show_connected_streets (Hash_map* hash_map, Street* closest_street){
     printf("    - %s\n", closest_street->street_name);
     printf("        Which is connected to:\n");
     // ara busquem els carrers connectats al més proper i els mostrem
-    // busquem els carrers conenctats a la intersecció inicial
-    /*StreetNode* connected_1 = get_streets_at_intersection(hash_map, closest_street->from_id);
-    while (connected_1 != NULL){
-        printf("            - %s.\n", connected_1->carrer.street_name);
-        connected_1 = connected_1->next;
-    }*/
-    // i els carrers connectats a la intersecció final
     StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
     while (connected_2 != NULL){
-        printf("         - %s\n", connected_2->carrer.street_name);
+        if (!(connected_2->carrer.from_id == closest_street->to_id &&
+            connected_2->carrer.to_id   == closest_street->from_id))
+            printf("         - %s\n", connected_2->carrer.street_name);
         connected_2 = connected_2->next;
     }
 }
@@ -310,6 +305,8 @@ int main() {
     free(posicio_desti);
     free(closest_street);
     free(closest_street_desti);
+    free_linked_streets(list_of_streets);
+    free_linked_streets(cami);
     return 0;
 }
 

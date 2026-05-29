@@ -139,6 +139,7 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
     }
     //demanem a l'usuari que esculli la street a la qual està
     int opcio;
+    printf ("You are in:\n");
     if (top_3[0] == NULL) { printf("Street not found.\n"); return NULL; }
     printf("You are in:\n");
     printf("1. %s\n", top_3[0]->street_name);
@@ -185,13 +186,18 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
     HouseNode* current_ = head;
     while (current_ != NULL){
-        if (strcmp(current->street_name,street_name) == 0 && current_->house_number == choice) {
-            return current_;
-        }
-        current_ = current_->next;
-    }
-
+    if (strcmp(current_->street_name, street_name) == 0 && current_->house_number == choice) return current_;
+    current_ = current_->next;
+}
     // En cas de no trobar cap coïncidència, diem que el número no es vàlid
     printf("Número invàlid.\n");
     return NULL;
+}
+
+void free_linked_houses(HouseNode* head) {
+    while (head != NULL) {
+        HouseNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
 }

@@ -116,3 +116,11 @@ PlaceNode* find_place(PlaceNode* head, char* target_place) {
     // si la opcio és vàlida retornem el place que hagi escollit l'usuari
     else return top_3[opcio-1];
 }
+
+void free_linked_places(PlaceNode* head) {
+    while (head != NULL) {
+        PlaceNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
+}

@@ -290,3 +290,11 @@ char* calculate_turn(Position A, Position B, Position C) {
     else if (cross_product < 0.0)  return "right";   // gir a la dreta
     else return "straight";                          // seguir recte
 }
+
+void free_linked_streets(StreetNode* head) {
+    while (head != NULL) {
+        StreetNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
