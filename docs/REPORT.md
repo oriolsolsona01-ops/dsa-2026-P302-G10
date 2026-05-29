@@ -8,66 +8,69 @@
 
 ### 1.1. Inicialització del mapa d'interseccions (Lab 5)
 
-El mapa d'interseccions és una taula de hash on la clau és l'ID d'una intersecció i el valor és la llista de segments de carrer que hi comencen. Per inicialitzar-lo, recorrem tots els segments de carrer de la llista i, per cada segment, inserim el seu segment a la llista de la seva intersecció d'origen al hashmap. Sigui **N** el nombre total de segments de carrer:
+El mapa d'interseccions és una taula de hash on la clau és l'ID d'una intersecció i el valor és la llista de carrers que hi comencen. Per construir-lo, recorrem tots els segments de carrer i per cada un l'afegim a la llista de la seva intersecció d'origen. Sigui **N** el nombre total de segments de carrer:
 
-- **Cas millor:** O(N) — tots els segments es distribueixen uniformement i no hi ha col·lisions. Cada inserció és O(1).
-- **Cas mitjà:** O(N) — amb una bona funció de hash, les col·lisions són poques i cada inserció amortitzada és O(1).
-- **Cas pitjor:** O(N²) — si la funció de hash produeix moltes col·lisions i tots els elements cauen al mateix bucket, cada inserció requereix recórrer tota la cadena.
+- **Cas millor:** O(N) — cada segment va a un bucket diferent i no hi ha col·lisions. Cada inserció és O(1).
+- **Cas mitjà:** O(N) — hi ha poques col·lisions i cada inserció és O(1).
+- **Cas pitjor:** O(N²) — tots els segments cauen al mateix bucket i cal recórrer tota la llista per inserir cada element.
 
 ### 1.2. Trobar les coordenades d'un carrer o lloc donat el nom (Labs 2 i 3)
 
-La cerca es fa de forma seqüencial a través de la llista enllaçada de cases o llocs. Sigui **N** el nombre total de cases (o llocs):
+Per trobar un carrer o lloc, recorrem la llista d'un en un comparant el nom fins trobar-lo. Sigui **N** el nombre total de cases o llocs:
 
-- **Cas millor:** O(1) — l'element cercat és el primer de la llista.
-- **Cas mitjà:** O(N) — cal recórrer aproximadament la meitat de la llista.
-- **Cas pitjor:** O(N) — l'element és l'últim o no existeix, cal recórrer-la sencera.
+- **Cas millor:** O(1) — el primer element de la llista ja és el que busquem.
+- **Cas mitjà:** O(N) — hem de recórrer aproximadament la meitat de la llista.
+- **Cas pitjor:** O(N) — l'element és l'últim de la llista o no existeix.
 
 ### 1.3. Algorisme de cerca de camins (BFS)
 
-Sigui **V** el nombre de nodes (interseccions) i **E** el nombre d'arestes (segments de carrer):
+El BFS explora el graf de carrers per capes fins a trobar la destinació. Sigui **V** el nombre d'interseccions i **E** el nombre de segments de carrer:
 
-- **Cas millor:** O(1) — l'origen i la destinació són segments adjacents.
-- **Cas mitjà:** O(V + E) — BFS visita cada node i aresta com a màxim una vegada.
-- **Cas pitjor:** O(V + E) — cal explorar tot el graf.
+- **Cas millor:** O(1) — l'origen i la destinació són el mateix segment o adjacents.
+- **Cas mitjà:** O(V + E) — el BFS visita cada intersecció i segment com a màxim una vegada.
+- **Cas pitjor:** O(V + E) — cal explorar tot el graf abans de trobar la destinació.
 
-> **Nota:** Si la llista de visitats s'implementa com a llista enllaçada (cerca O(V) per comprovació), el pitjor cas passa a ser O(V · (V + E)).
+> **Nota:** A la nostra implementació, comprovar si una intersecció ja ha estat visitada es fa recorrent tota la cua, amb cost O(V) per comprovació. Això fa que el pitjor cas real sigui O(V · (V + E)).
 
 ---
 
 ## 2. Anàlisi Experimental de Latència
 
-> Les dades s'han obtingut mesurant el temps d'execució amb `clock()` de la biblioteca estàndard de C, repetint cada mesura múltiples vegades sobre la mateixa màquina. Els mapes utilitzats són els del repositori (xs\_2, md\_1, lg\_1, xl\_1).
+> Les dades s'han obtingut mesurant el temps d'execució amb `clock()` de C, repetint cada mesura múltiples vegades sobre la mateixa màquina. Els mapes utilitzats són xs\_2, md\_1, lg\_1 i xl\_1.
 
 ### 2.1. Latència per trobar carrers connectats segons la mida del mapa
 
-#### Dades en brut (Make m 5 cops)
+#### Dades en brut
 
 | Mapa  | Interseccions | Latència seqüencial (ms) | Latència hashmap (ms) |
 |-------|:-------------:|:------------------------:|:---------------------:|
-| xs\_2 | 71            | 0.0016                   | 0.0026               |
-| md\_1 | 1.122         | 0.0098                   | 0.0034               |
-| lg\_1 | 3.283         | 0.0890                  | 0.0046                |
-| xl\_1 | 15.378        | 0.4780                    | 0.0036               |
+| xs\_2 | 71            | 0.0016                   | 0.0026                |
+| md\_1 | 1.122         | 0.0098                   | 0.0034                |
+| lg\_1 | 3.283         | 0.0890                   | 0.0046                |
+| xl\_1 | 15.378        | 0.4780                   | 0.0036                |
 
 #### Gràfica
 
-![Gràfica Comparativa de Latències](Plot1.png) 
+![Latència per trobar carrers connectats vs mida del mapa](plot1.png)
 
 #### Explicació
 
-La cerca seqüencial recorre tota la llista de segments per trobar els carrers connectats, amb complexitat O(N). La latència creix linealment amb la mida del mapa. El hashmap permet accedir directament als carrers connectats a partir de l'ID de la intersecció amb cost amortitzat O(1), mantenint la latència pràcticament constant independentment de la mida del mapa.
+Amb la cerca seqüencial, per trobar els carrers connectats a una intersecció cal recórrer tota la llista de segments un per un. Com més gran és el mapa, més segments hi ha i més triga. Per això el temps creix amb la mida del mapa. 
+
+Amb el hashmap, podem accedir directament als carrers d'una intersecció donada la seva ID, sense recórrer res. Per això el temps es manté pràcticament igual independentment de la mida del mapa.
 
 ---
 
 ### 2.2. Latència per trobar un camí segons la mida del mapa
 
 #### Dades en brut
-| Mapa | Interseccions | BFS + seqüencial (ms) | BFS + hashmap (ms) |
-| :--- | :--- | :---: | :---: |
-| xs\_2 | 71 | 0.0150 | 0.0012 |
-| md\_1 | 1.122 | 1.8500 | 0.0055 |
-| lg\_1 | 3.283 | 24.1200 | 0.0140 |
-| xl\_1 | 15.378 | 495.3000 | 0.0480 |
+
+| Mapa   | Interseccions | BFS + seqüencial (ms) | BFS + hashmap (ms) |
+|--------|:-------------:|:---------------------:|:------------------:|
+| xs\_2  | 71            | 0.0588                | 0.1212             |
+| md\_1  | 1.122         | 4.3270                | 5.6186             |
+| lg\_1  | 3.283         | 21.4390               | 23.9040            |
+| xl\_1  | 15.378        | 784.6264              | 837.5526           |
 
 #### Gràfica
 
@@ -75,7 +78,9 @@ La cerca seqüencial recorre tota la llista de segments per trobar els carrers c
 
 #### Explicació
 
-Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota la llista per trobar els veïns: cost total O(V · N). Amb el hashmap, cada consulta de veïns és O(1) amortitzada i el BFS es manté en O(V + E), de manera que la latència creix molt més lentament amb la mida del mapa.
+Els temps del BFS amb hashmap i amb cerca seqüencial surten molt similars. Això passa perquè el punt lent del nostre BFS no és buscar els carrers veïns, sinó comprovar si una intersecció ja ha estat visitada. Per fer aquesta comprovació recorrem tota la llista de nodes ja explorats un per un, i això triga igual tant si usem hashmap com si no.
+
+Per veure una diferència real entre les dues versions caldria també millorar la manera de guardar els nodes visitats, tal com es proposa a la secció 3.
 
 ---
 
@@ -83,12 +88,12 @@ Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota l
 
 #### Dades en brut
 
-| Distància aprox. (m) | Origen → Destinació | BFS + seqüencial (ms) | BFS + hashmap (ms) |
-| :--- | :--- | :---: | :---: |
-| ~500 | 1024 → 1085 | 18.2500 | 0.0025 |
-| ~2.000 | 1024 → 3042 | 95.4000 | 0.0098 |
-| ~5.000 | 1024 → 7581 | 242.1000 | 0.0245 |
-| ~10.000 | 1024 → 14210 | 495.3000 | 0.0480 |
+| Distància aprox. (m) | Origen → Destinació     | BFS + seqüencial (ms) | BFS + hashmap (ms) |
+|:--------------------:|-------------------------|:---------------------:|:------------------:|
+| ~500                 | UPF → Parc Ciutadella   | 1.8840                | 1.8590             |
+| ~2.000               | UPF → Estació de França | 102.0760              | 114.7150           |
+| ~5.000               | UPF → Glòries           | 426.8480              | 419.9430           |
+| ~10.000              | UPF → L'Illa Diagonal   | 857.9760              | 898.4270           |
 
 #### Gràfica
 
@@ -96,7 +101,9 @@ Amb cerca seqüencial, per cada node explorat durant el BFS cal recórrer tota l
 
 #### Explicació i ajust de corba
 
-La latència creix a mesura que augmenta la distància entre origen i destinació, ja que el BFS ha d'explorar més nodes i arestes del graf. Els resultats confirmen l'ajust de corba teòric. Amb el hashmap, s'observa un creixement lineal respecte a la distància, ja que el cost d'explorar cada node és constant, O(1), mantenint el BFS en la seva complexitat ideal O(V + E). En canvi, amb la cerca seqüencial, la corba es comporta de manera quadràtica; a mesura que augmenta la distància, creix el nombre de nodes visitats i cadascun d'ells replica el cost O(N) de recórrer tota la llista de carrers, penalitzant greument l'eficiència del sistema en trajectes llargs.
+Com més lluny és la destinació, més interseccions ha d'explorar el BFS i més triga. Els temps creixen de forma pronunciada a distàncies llargues perquè a la nostra implementació comprovar els nodes visitats costa O(V) per cada pas, fent que el comportament real s'acosti a O(V²).
+
+Els temps del BFS amb hashmap i seqüencial tornen a ser similars pel mateix motiu que a la secció 2.2: el punt lent és la llista de visitats, no la cerca de veïns.
 
 ---
 
@@ -104,40 +111,39 @@ La latència creix a mesura que augmenta la distància entre origen i destinaci�
 
 **Estructura proposada:** taula de hash (hashmap)
 
-**Situació actual:** La llista de visitats és una llista enllaçada. Comprovar si un node ha estat visitat costa O(V) per comprovació i O(V²) en total per al BFS.
-
-**Millora:** Substituir la llista per un hashmap on la clau és l'ID de la intersecció i el valor és un booleà (visitat / no visitat).
+Al nostre BFS, cada vegada que trobem un carrer veí hem de comprovar si ja l'hem visitat. Ara ho fem mirant tota la llista de carrers ja explorats un per un, cosa que és lenta (O(V) per cada comprovació). Si en lloc d'una llista usem un hashmap on la clau és l'ID de la intersecció, podem saber en un sol pas si ja ha estat visitada (O(1)).
 
 | Operació              | Llista (actual) | Hashmap (millora) |
 |-----------------------|:---------------:|:-----------------:|
-| Comprovar si visitat  | O(V)            | O(1) amortitzat   |
-| Inserir com a visitat | O(1)            | O(1) amortitzat   |
+| Comprovar si visitat  | O(V)            | O(1)              |
+| Marcar com a visitat  | O(1)            | O(1)              |
 | **Total BFS**         | O(V · (V+E))    | O(V + E)          |
 
 **Inconvenients:**
-- Consumeix més memòria que una llista simple.
-- En mapes petits, l'overhead d'inicialitzar el hashmap pot fer-lo més lent que la llista.
-- En cas de moltes col·lisions, el pitjor cas segueix sent O(V) per operació.
+- Ocupa més memòria que una llista simple.
+- En mapes molt petits pot ser lleugerament més lent per la inicialització.
+- Si molts elements cauen al mateix bucket, el pitjor cas segueix sent O(V).
 
 ---
 
 ## 4. Millora per Trobar el Segment de Carrer més Proper a unes Coordenades
 
-**Situació actual:** Es recorren seqüencialment tots els segments, calculant el punt mig i la distància haversine. Complexitat: **O(N)**.
+**Situació actual:** Per trobar el carrer més proper a una posició, mirem tots els segments un per un i calculem la distància. Complexitat: **O(N)**.
 
-**Millora proposada:** KD-Tree
+**Millora proposada:** Llista ordenada per latitud + cerca binària
 
-Un KD-Tree organitza els punts en un espai 2D (latitud, longitud) per permetre cerques de veí més proper de forma eficient.
+La idea és ordenar tots els segments per latitud quan carreguem el mapa. Quan volem trobar el carrer més proper, en lloc de mirar-los tots, usem cerca binària per anar directament als segments amb latitud semblant a la nostra posició i només calculem la distància d'aquells.
 
-| Operació          | Llista seqüencial (actual) | KD-Tree (millora) |
-|-------------------|:--------------------------:|:-----------------:|
-| Construcció       | O(N)                       | O(N log N)        |
-| Cerca (cas mitjà) | O(N)                       | O(log N)          |
-| Cerca (cas pitjor)| O(N)                       | O(N)              |
+| Operació    | Llista sense ordenar (actual) | Llista ordenada + cerca binària |
+|-------------|:-----------------------------:|:-------------------------------:|
+| Construcció | O(N)                          | O(N log N)                      |
+| Cerca       | O(N)                          | O(log N + K)                    |
 
-La construcció es fa una sola vegada en carregar el mapa, de manera que el cost addicional queda amortitzat si es fan múltiples cerques.
+On K és el nombre de segments amb latitud propera a la coordenada buscada.
+
+Com que l'ordenació es fa una sola vegada en carregar el mapa, el cost extra val la pena si després fem moltes cerques.
 
 **Inconvenients:**
-- La implementació és molt més complexa que una llista.
-- Consumeix més memòria per mantenir l'estructura d'arbre equilibrat.
-- En el pitjor cas amb coordenades molt desequilibrades, la cerca es pot degradar a O(N).
+- Ordenar per latitud no sempre troba el carrer més proper: dos carrers poden tenir latitud semblant però estar molt lluny si tenen longitud molt diferent.
+- Ordenar triga O(N log N) en lloc de O(N).
+- Si afegim o eliminem carrers del mapa caldria tornar a ordenar.
