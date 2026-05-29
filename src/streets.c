@@ -189,6 +189,8 @@ void add_street_to_intersection(Hash_map* mapa, long long intersection_id, Stree
         mapa->entries[index].list_of_streets = NULL;
         mapa->count ++;
     }
+
+    
     // creem un nou street list amb elnou carrer a la primera posició
     StreetNode* new_node = (StreetNode*)malloc(sizeof(StreetNode));
     new_node->carrer = street;
