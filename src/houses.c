@@ -82,7 +82,19 @@ void expand_abbreviations(const char* original, char* dest) {
     else if (strncmp(original, "ptge. ", 6) == 0) {
         strcpy(dest, "passatge ");
         strcat(dest, original + 6); // Saltem els 6 caràcters de "ptge. "
-    } 
+    }
+    else if (strncmp(original, "pl. ", 4) == 0) {
+        strcpy(dest, "plaça ");
+        strcat(dest, original + 4);
+    }
+    else if (strncmp(original, "rda. ", 5) == 0) {
+        strcpy(dest, "ronda ");
+        strcat(dest, original + 5);
+    }
+    else if (strncmp(original, "ctra. ", 6) == 0) {
+        strcpy(dest, "carretera ");
+        strcat(dest, original + 6);
+    }
     // Si no comença per cap abreviatura, simplement ho copiem tal qual
     else {
         strcpy(dest, original);
@@ -139,7 +151,6 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
     }
     //demanem a l'usuari que esculli la street a la qual està
     int opcio;
-    printf ("You are in:\n");
     if (top_3[0] == NULL) { printf("Street not found.\n"); return NULL; }
     printf("You are in:\n");
     printf("1. %s\n", top_3[0]->street_name);
@@ -179,10 +190,16 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     }
     
     // Una vegada mostrats tots els números possibles, fem escollir un
-    int choice;
-    printf("Tria un número: ");
-    scanf("%d", &choice);
-
+    int choice = -1;
+    while (choice == -1){
+        printf("Tria un número: ");
+        if (scanf("%d", &choice) != 1) {
+            while(getchar() != '\n');
+            printf("Número invàlid.\n");
+        }
+    }
+    
+    
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
     HouseNode* current_ = head;
     while (current_ != NULL){

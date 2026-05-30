@@ -42,7 +42,10 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
         scanf(" %[^\n]", street_name);
 
         HouseNode* trobat = find_house_name(list_of_houses, street_name);
-        if (trobat == NULL) return NULL;
+        if (trobat == NULL){
+            free_linked_houses(list_of_houses);  
+            return NULL;
+        }
         else{
             printf("Enter street number (e.g. \"138\"): ");
             scanf("%d", &num);
@@ -50,17 +53,20 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
 
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
         
-        if (final_house != NULL) {
-            printf("\n    Found at (%f, %f)\n", final_house->lat, final_house->lon);
-        } else {
+        if (final_house == NULL) {
             printf("    Address not found.\n");
+            free_linked_houses(list_of_houses);
+            return NULL;
         }
+
+        printf("\n    Found at (%f, %f)\n", final_house->lat, final_house->lon);
 
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
         posicio_place->lat = final_house->lat;
         posicio_place->lon = final_house->lon;
 
+        free_linked_houses(list_of_houses);
         return posicio_place;
 
     }
@@ -76,16 +82,19 @@ Position* input_originposition(char* mapa){ // tasca 2,3 i 4 (el paràmtre d'ent
 
         PlaceNode* trobat = find_place(list_of_places, place_name);
 
-        if (trobat != NULL) {
-            printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
-        } else {
+        if (trobat == NULL) {
             printf("    Place not found.\n");
+            free_linked_places(list_of_places);
+            return NULL;
         }
+
+        printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
+
         Position* posicio_place = (Position*)malloc(sizeof(Position));
 
         posicio_place->lat = trobat->lat;
         posicio_place->lon = trobat->lon;
-
+        free_linked_places(list_of_places);
         return posicio_place;
         
     }
@@ -124,7 +133,10 @@ Position* input_destinationposition(char* mapa){
         scanf(" %[^\n]", street_name);
 
         HouseNode* trobat = find_house_name(list_of_houses, street_name);
-        if (trobat == NULL) return NULL;
+        if (trobat == NULL){
+            free_linked_houses(list_of_houses);
+            return NULL;
+        }
         else{
             printf("Enter street number (e.g. \"138\"): ");
             scanf("%d", &num);
@@ -132,17 +144,19 @@ Position* input_destinationposition(char* mapa){
 
         HouseNode* final_house = triar_num(list_of_houses, trobat->street_name, num);
 
-        if (final_house != NULL) {
-            printf("    Found at (%f, %f)\n", final_house->lat, final_house->lon);
-        } else {
+        if (final_house == NULL) {
             printf("    Address not found.\n");
+            free_linked_houses(list_of_houses);
+            return NULL;
         }
 
+        printf("    Found at (%f, %f)\n", final_house->lat, final_house->lon);
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
         posicio_place->lat = final_house->lat;
         posicio_place->lon = final_house->lon;
 
+        free_linked_houses(list_of_houses);
         return posicio_place;
 
     }
@@ -162,13 +176,14 @@ Position* input_destinationposition(char* mapa){
             printf("    Found at (%f, %f)\n", trobat->lat, trobat->lon);
         } else {
             printf("    Place not found.\n");
+            free_linked_places(list_of_places);
             return NULL;
         }
         Position* posicio_place = (Position*)malloc(sizeof(Position));
         
         posicio_place->lat = trobat->lat;
         posicio_place->lon = trobat->lon;
-
+        free_linked_places(list_of_places);
         return posicio_place;
         
     }
