@@ -8,14 +8,14 @@
 
 ### 1.1. Inicialització del mapa d'interseccions (Lab 5)
 
-El mapa d'interseccions és una taula de hash on la clau és l'ID d'una intersecció i el valor és la llista de carrers que hi comencen. Per construir-lo, recorrem tots els segments de carrer i per cada un l'afegim a la llista de la seva intersecció d'origen. Sigui **N** el nombre total de segments de carrer:
+El mapa d'interseccions és una taula de hash on la clau és l'ID d'una intersecció i el valor és la llista de carrers que hi comencen. Per construir-lo, recorrem tots els segments de carrer i per cada un l'afegim a la llista de la seva intersecció d'origen. (N és el nombre de segments)
 
 - Cas millor: O(N) — tots els segments apunten a interseccions noves (count=0 quan s'insereix cada una, la cerca és immediata).
 - Cas mitjà i pitjor: O(N²) — per cada dels N segments cal cercar linealment entre les interseccions ja inserides.
 
 ### 1.2. Trobar les coordenades d'un carrer o lloc donat el nom (Labs 2 i 3)
 
-Per trobar un carrer o lloc, recorrem la llista d'un en un comparant el nom fins trobar-lo. Sigui **N** el nombre total de cases o llocs:
+Per trobar un carrer o lloc, recorrem la llista d'un en un comparant el nom fins trobar-lo. N és el nombre total de cases o llocs:
 
 - **Cas millor:** O(1) — el primer element de la llista ja és el que busquem.
 - **Cas mitjà:** O(N) — hem de recórrer aproximadament la meitat de la llista.
@@ -23,7 +23,7 @@ Per trobar un carrer o lloc, recorrem la llista d'un en un comparant el nom fins
 
 ### 1.3. Algorisme de cerca de camins (BFS)
 
-El BFS explora el graf de carrers per capes fins a trobar la destinació. Sigui **V** el nombre d'interseccions i **E** el nombre de segments de carrer:
+El BFS explora el graf de carrers per capes fins a trobar la destinació on V el nombre d'interseccions i E (arestes) el nombre de segments de carrer:
 
 - **Cas millor:** O(1) — l'origen i la destinació són el mateix segment o adjacents.
 - **Cas mitjà:** O(V + E) — el BFS visita cada intersecció i segment com a màxim una vegada.
