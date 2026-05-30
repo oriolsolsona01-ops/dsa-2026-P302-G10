@@ -104,8 +104,8 @@ PlaceNode* find_place(PlaceNode* head, char* target_place) {
     int opcio;
     printf ("You are in:\n");
     printf ("1. %s.\n", top_3[0]->PlaceName);
-    printf ("2. %s.\n", top_3[1]->PlaceName);
-    printf ("3. %s.\n", top_3[2]->PlaceName);
+    if (top_3[1] != NULL) printf ("2. %s.\n", top_3[1]->PlaceName);
+    if (top_3[2] != NULL) printf ("3. %s.\n", top_3[2]->PlaceName);
     scanf("%d", &opcio);
 
     // comprovem que la opcio és vàlida
@@ -115,4 +115,12 @@ PlaceNode* find_place(PlaceNode* head, char* target_place) {
     }
     // si la opcio és vàlida retornem el place que hagi escollit l'usuari
     else return top_3[opcio-1];
+}
+
+void free_linked_places(PlaceNode* head) {
+    while (head != NULL) {
+        PlaceNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
 }

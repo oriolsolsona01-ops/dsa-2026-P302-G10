@@ -82,7 +82,19 @@ void expand_abbreviations(const char* original, char* dest) {
     else if (strncmp(original, "ptge. ", 6) == 0) {
         strcpy(dest, "passatge ");
         strcat(dest, original + 6); // Saltem els 6 caràcters de "ptge. "
-    } 
+    }
+    else if (strncmp(original, "pl. ", 4) == 0) {
+        strcpy(dest, "plaça ");
+        strcat(dest, original + 4);
+    }
+    else if (strncmp(original, "rda. ", 5) == 0) {
+        strcpy(dest, "ronda ");
+        strcat(dest, original + 5);
+    }
+    else if (strncmp(original, "ctra. ", 6) == 0) {
+        strcpy(dest, "carretera ");
+        strcat(dest, original + 6);
+    }
     // Si no comença per cap abreviatura, simplement ho copiem tal qual
     else {
         strcpy(dest, original);
@@ -139,10 +151,12 @@ HouseNode* find_house_name(HouseNode* head, char* target_street) {
     }
     //demanem a l'usuari que esculli la street a la qual està
     int opcio;
-    printf ("You are in:\n");
-    printf ("1. %s.\n", top_3[0]->street_name);
-    printf ("2. %s.\n", top_3[1]->street_name);
-    printf ("3. %s.\n", top_3[2]->street_name);
+    if (top_3[0] == NULL) { printf("Street not found.\n"); return NULL; }
+    printf("You are in:\n");
+    printf("1. %s\n", top_3[0]->street_name);
+    if (top_3[1] != NULL) printf("2. %s\n", top_3[1]->street_name);
+    if (top_3[2] != NULL) printf("3. %s\n", top_3[2]->street_name);
+
     scanf("%d", &opcio);
 
     // comprovem que la opcio és vàlida
@@ -159,7 +173,7 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
     HouseNode* current = head;
     while (current != NULL){
         // Mirem si coincideix i, en cas de que si, presentem per pantalla el número d'aquesta
-        if (current->street_name == street_name && current->house_number == num ){
+        if (strcmp(current->street_name,street_name) == 0 && current->house_number == num ){
             return current;
         }
         current = current->next;
@@ -170,26 +184,37 @@ HouseNode* triar_num(HouseNode* head, char *street_name, int num){
 
     current = head;
     while (current != NULL){
-        if (current->street_name == street_name)
+        if (strcmp(current->street_name,street_name) == 0)
             printf("***[%d]***\n", current->house_number);
         current = current-> next;
     }
     
     // Una vegada mostrats tots els números possibles, fem escollir un
-    int choice;
-    printf("Tria un número: ");
-    scanf("%d", &choice);
-
+    int choice = -1;
+    while (choice == -1){
+        printf("Tria un número: ");
+        if (scanf("%d", &choice) != 1) {
+            while(getchar() != '\n');
+            printf("Número invàlid.\n");
+        }
+    }
+    
+    
     // Una vegada escollit, tornem a recorrer la llista i retornem el que té el número escollit
     HouseNode* current_ = head;
     while (current_ != NULL){
-        if (current_->street_name == street_name && current_->house_number == choice) {
-            return current_;
-        }
-        current_ = current_->next;
-    }
-
+    if (strcmp(current_->street_name, street_name) == 0 && current_->house_number == choice) return current_;
+    current_ = current_->next;
+}
     // En cas de no trobar cap coïncidència, diem que el número no es vàlid
     printf("Número invàlid.\n");
     return NULL;
+}
+
+void free_linked_houses(HouseNode* head) {
+    while (head != NULL) {
+        HouseNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
 }

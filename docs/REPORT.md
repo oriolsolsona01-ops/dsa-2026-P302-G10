@@ -76,7 +76,7 @@ Amb el hashmap, podem accedir directament als carrers d'una intersecció donada 
 
 ![Latència per trobar un camí vs mida del mapa](plot2.png)
 
-#### Explicació
+##### Explicació
 
 Els temps del BFS amb hashmap i amb cerca seqüencial surten molt similars. Això passa perquè el punt lent del nostre BFS no és buscar els carrers veïns, sinó comprovar si una intersecció ja ha estat visitada. Per fer aquesta comprovació recorrem tota la llista de nodes ja explorats un per un, i això triga igual tant si usem hashmap com si no.
 
@@ -99,7 +99,7 @@ Per veure una diferència real entre les dues versions caldria també millorar l
 
 ![Latència per trobar un camí vs distància](plot3.png)
 
-#### Explicació i ajust de corba
+##### Explicació i ajust de corba
 
 Com més lluny és la destinació, més interseccions ha d'explorar el BFS i més triga. Els temps creixen de forma pronunciada a distàncies llargues perquè a la nostra implementació comprovar els nodes visitats costa O(V) per cada pas, fent que el comportament real s'acosti a O(V²).
 

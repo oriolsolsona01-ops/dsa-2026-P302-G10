@@ -189,6 +189,8 @@ void add_street_to_intersection(Hash_map* mapa, long long intersection_id, Stree
         mapa->entries[index].list_of_streets = NULL;
         mapa->count ++;
     }
+
+    
     // creem un nou street list amb elnou carrer a la primera posició
     StreetNode* new_node = (StreetNode*)malloc(sizeof(StreetNode));
     new_node->carrer = street;
@@ -287,4 +289,12 @@ char* calculate_turn(Position A, Position B, Position C) {
     if (cross_product > 0.0) return "left";          // gir a l'esquerra
     else if (cross_product < 0.0)  return "right";   // gir a la dreta
     else return "straight";                          // seguir recte
+}
+
+void free_linked_streets(StreetNode* head) {
+    while (head != NULL) {
+        StreetNode* temp = head;
+        head = head->next;
+        free(temp);
+    }
 }
