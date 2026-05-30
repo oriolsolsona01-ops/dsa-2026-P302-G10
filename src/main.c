@@ -261,6 +261,7 @@ int main() {
     printf("*****************\nWelcome to DSA!\n*****************\n");
     char* mapa = choose_map();
     Position* posicio_origen = input_originposition(mapa);
+    if (posicio_origen == NULL) return 0;
     // busquem la el carrer més proper
     FILE* street_file = open_map_streets(mapa);
     if (street_file == NULL) return 0;
@@ -278,6 +279,14 @@ int main() {
     show_connected_streets(map, closest_street, list_of_streets);
 
     Position* posicio_desti = input_destinationposition(mapa);
+
+    if (posicio_desti == NULL){
+        free_hashmap(map);
+        free(posicio_origen); 
+        free(closest_street); 
+        free_linked_streets(list_of_streets); 
+        return 0; 
+    }
 
     Street* closest_street_desti = input_closest_street(posicio_desti,list_of_streets);
   
