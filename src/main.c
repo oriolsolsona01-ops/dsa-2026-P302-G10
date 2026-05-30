@@ -193,17 +193,33 @@ Position* input_destinationposition(char* mapa){
     return NULL;
 }
 //**********HELPER FUNCTION**********
-void show_connected_streets (Hash_map* hash_map, Street* closest_street){
+void show_connected_streets (Hash_map* hash_map, Street* closest_street, StreetNode* list_of_streets){
     printf("\n    From this street segment, you can go to:\n");
     printf("    - %s\n", closest_street->street_name);
     printf("        Which is connected to:\n");
+
+    long long current_to_id = closest_street->to_id;
+
+    StreetNode* current = list_of_streets;
+    while (current != NULL) {
+        
+        if (current->carrer.from_id == current_to_id &&
+            strcmp(current->carrer.street_name, closest_street->street_name) == 0) {
+
+            current_to_id = current->carrer.to_id;
+            current = list_of_streets;
+        } else {
+            current = current->next;
+        }
+    }
+
     // ara busquem els carrers connectats al més proper i els mostrem
-    StreetNode* connected_2 = get_streets_at_intersection(hash_map, closest_street->to_id);
-    while (connected_2 != NULL){
-        if (!(connected_2->carrer.from_id == closest_street->to_id &&
-            connected_2->carrer.to_id   == closest_street->from_id))
-            printf("         - %s\n", connected_2->carrer.street_name);
-        connected_2 = connected_2->next;
+    StreetNode* connected = get_streets_at_intersection(hash_map, current_to_id);
+    while (connected != NULL){
+        
+        if (strcmp(connected->carrer.street_name, closest_street->street_name) != 0)
+            printf("         - %s\n", connected->carrer.street_name);
+        connected = connected->next;
     }
 }
 
@@ -259,7 +275,7 @@ int main() {
     Hash_map* map = fill_hashmap_from_streets(list_of_streets, 1024);
    
     // i mostrem el connexos
-    show_connected_streets(map, closest_street);
+    show_connected_streets(map, closest_street, list_of_streets);
 
     Position* posicio_desti = input_destinationposition(mapa);
 
