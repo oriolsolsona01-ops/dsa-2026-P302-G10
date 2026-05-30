@@ -10,9 +10,8 @@
 
 El mapa d'interseccions és una taula de hash on la clau és l'ID d'una intersecció i el valor és la llista de carrers que hi comencen. Per construir-lo, recorrem tots els segments de carrer i per cada un l'afegim a la llista de la seva intersecció d'origen. Sigui **N** el nombre total de segments de carrer:
 
-- **Cas millor:** O(N) — cada segment va a un bucket diferent i no hi ha col·lisions. Cada inserció és O(1).
-- **Cas mitjà:** O(N) — hi ha poques col·lisions i cada inserció és O(1).
-- **Cas pitjor:** O(N²) — tots els segments cauen al mateix bucket i cal recórrer tota la llista per inserir cada element.
+- Cas millor: O(N) — tots els segments apunten a interseccions noves (count=0 quan s'insereix cada una, la cerca és immediata).
+- Cas mitjà i pitjor: O(N²) — per cada dels N segments cal cercar linealment entre les interseccions ja inserides.
 
 ### 1.2. Trobar les coordenades d'un carrer o lloc donat el nom (Labs 2 i 3)
 
@@ -38,7 +37,9 @@ El BFS explora el graf de carrers per capes fins a trobar la destinació. Sigui 
 
 > Les dades s'han obtingut mesurant el temps d'execució amb `clock()` de C, repetint cada mesura múltiples vegades sobre la mateixa màquina. Els mapes utilitzats són xs\_2, md\_1, lg\_1 i xl\_1.
 
-### 2.1. Latència per trobar carrers connectats segons la mida del mapa
+### 2.1. Temps per trobar carrers connectats (veïns) en funció de la mida del mapa
+
+Busquem només a partir de la intersecció to.
 
 #### Dades en brut
 
@@ -51,17 +52,15 @@ El BFS explora el graf de carrers per capes fins a trobar la destinació. Sigui 
 
 #### Gràfica
 
-![Latència per trobar carrers connectats vs mida del mapa](plot1.png)
+![Temps en trobar connected streets segons la mida del mapa](plot1.png)
 
 #### Explicació
 
-Amb la cerca seqüencial, per trobar els carrers connectats a una intersecció cal recórrer tota la llista de segments un per un. Com més gran és el mapa, més segments hi ha i més triga. Per això el temps creix amb la mida del mapa. 
+Amb la cerca seqüencial, per trobar els carrers connectats a una intersecció cal recórrer tota la llista de segments un per un. Com més gran és el mapa, més segments hi ha i més triga. Per això el temps creix amb la mida del mapa. La complexitat és O(M).
 
-Amb el hashmap, podem accedir directament als carrers d'una intersecció donada la seva ID, sense recórrer res. Per això el temps es manté pràcticament igual independentment de la mida del mapa.
+Amb el hashmap, podem accedir directament als carrers d'una intersecció donada la seva ID, sense recórrer res. Per això el temps es manté pràcticament igual independentment de la mida del mapa. La complexitat és O(1).
 
----
-
-### 2.2. Latència per trobar un camí segons la mida del mapa
+### 2.2. Temps per trpbar un camí segons la mida del mapa
 
 #### Dades en brut
 
@@ -74,17 +73,17 @@ Amb el hashmap, podem accedir directament als carrers d'una intersecció donada 
 
 #### Gràfica
 
-![Latència per trobar un camí vs mida del mapa](plot2.png)
+![Temps en trobar un camí segons la mida del mapa](plot2.png)
 
 ##### Explicació
 
-Els temps del BFS amb hashmap i amb cerca seqüencial surten molt similars. Això passa perquè el punt lent del nostre BFS no és buscar els carrers veïns, sinó comprovar si una intersecció ja ha estat visitada. Per fer aquesta comprovació recorrem tota la llista de nodes ja explorats un per un, i això triga igual tant si usem hashmap com si no.
+Els temps del BFS amb hashmap i amb cerca seqüencial surten molt similars. Això passa perquè el punt lent del nostre BFS no és buscar els carrers veïns, sinó comprovar si una intersecció ja ha estat visitada. Per fer aquesta comprovació recorrem tota la llista de nodes ja explorats un per un, i això triga igual tant si usem hashmap com si no. La complexitat lineal de comprovar si un veí ha estat visitat preval sobre la de trobar els veÏns de cada intersecció en el hashmap O(1).
 
 Per veure una diferència real entre les dues versions caldria també millorar la manera de guardar els nodes visitats, tal com es proposa a la secció 3.
 
 ---
 
-### 2.3. Latència per trobar un camí segons la distància entre origen i destinació
+### 2.3. Cerca de camins segons la distància entre punt i punt
 
 #### Dades en brut
 
@@ -97,22 +96,22 @@ Per veure una diferència real entre les dues versions caldria també millorar l
 
 #### Gràfica
 
-![Latència per trobar un camí vs distància](plot3.png)
+![Cerca de camins en funció de la distància ](plot3.png)
 
 ##### Explicació i ajust de corba
 
-Com més lluny és la destinació, més interseccions ha d'explorar el BFS i més triga. Els temps creixen de forma pronunciada a distàncies llargues perquè a la nostra implementació comprovar els nodes visitats costa O(V) per cada pas, fent que el comportament real s'acosti a O(V²).
+Com més lluny és la destinació, més interseccions ha d'explorar el BFS i més temps tard en arribar a destinació. Els temps creixen de forma lineal a distàncies llargues.
 
-Els temps del BFS amb hashmap i seqüencial tornen a ser similars pel mateix motiu que a la secció 2.2: el punt lent és la llista de visitats, no la cerca de veïns.
+Els temps del BFS amb hashmap i seqüencial tornen a ser similars pel mateix motiu que a la secció 2.2: El que causa la igualtat en el temps malgrat diferents algoritmes és la comprovació de si un veí ha estat o no visitat, i no la mateixa cerca de veïns.
 
----
+* Els resultats de les taules han estat fruit de la mitjana de 5 repeticions de la crida de la funció que mesura els diferents temps.
 
 ## 3. Millora de l'Estructura de Dades de Visitats al BFS
 
 **Estructura proposada:** taula de hash (hashmap)
 
-Al nostre BFS, cada vegada que trobem un carrer veí hem de comprovar si ja l'hem visitat. Ara ho fem mirant tota la llista de carrers ja explorats un per un, cosa que és lenta (O(V) per cada comprovació). Si en lloc d'una llista usem un hashmap on la clau és l'ID de la intersecció, podem saber en un sol pas si ja ha estat visitada (O(1)).
-
+Al nostre BFS, cada vegada que trobem un carrer veí hem de comprovar si ja l'hem visitat. Ara ho fem mirant tota la llista de carrers ja explorats un per un, el qual és poc eficient. El que hem pensat i implementat és un hashmap en lloc d'una llista on la clau és l'ID de la intersecció, ja que d'aquesta manera podem saber en un sol pas si ja ha estat visitada (O(1)).
+Quan volem marcar una intersecció com a visitada, calculem una funció matemàtica sobre el seu ID (la funció hash) que ens dona directament la posició on guardar-la. Quan després volem comprovar si una intersecció ja ha estat visitada, calculem la mateixa funció i anem directament a aquella posició sense la necessitat de buscar-lo element per element i independentment del nombre d'interseccions visitades. 
 | Operació              | Llista (actual) | Hashmap (millora) |
 |-----------------------|:---------------:|:-----------------:|
 | Comprovar si visitat  | O(V)            | O(1)              |

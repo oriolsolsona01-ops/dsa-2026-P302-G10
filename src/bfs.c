@@ -46,6 +46,7 @@ StreetNode* BFS(Hash_map* intersections_graph, Street* fromStreet, Street* toStr
 
         // busquem cap a on podem anar
         StreetNode* connected = get_streets_at_intersection(intersections_graph, current_street.to_id);
+        // la funció get streets at inters. el que fa és el punter amb els carrers veïns per on el BFS pot continuar.
         
         while (connected != NULL) {
             Street* neighbor = &connected->carrer;
